@@ -1,0 +1,34 @@
+{
+  "id": "6ff0c6e3-279e-4d19-93c7-d8a7b74cef17",
+  "title": "List Files",
+  "description": "List Files Flow",
+  "flow": [
+    {
+      "implementor": "com.reedelk.rest.component.RESTListener",
+      "description": "REST Listener",
+      "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
+      "path": "/list",
+      "method": "GET",
+      "streaming": "AUTO",
+      "response": {
+        "body": "#[message.payload()]",
+        "status": 200
+      },
+      "errorResponse": {
+        "body": "#[error]",
+        "status": 500
+      }
+    },
+    {
+      "implementor": "com.reedelk.google.drive.component.FileList",
+      "description": "Google File List",
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
+    },
+    {
+      "implementor": "com.reedelk.json.component.ObjectToJSON",
+      "description": "Object to JSON",
+      "indentFactor": 2,
+      "prettyPrint": true
+    }
+  ]
+}
