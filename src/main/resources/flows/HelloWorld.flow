@@ -1,0 +1,35 @@
+{
+  "id": "93c8952f-a858-4ad9-ac23-4e5e30d92871",
+  "title": "GET Hello world flow",
+  "description": "Returns 'Hello world' text from GET /api/message",
+  "flow": [
+    {
+      "implementor": "com.reedelk.rest.component.RESTListener",
+      "description": "GET Hello World REST Listener",
+      "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
+      "path": "/message/{name:.*}",
+      "method": "GET",
+      "streaming": "AUTO",
+      "response": {
+        "body": "#[message.payload()]",
+        "status": 200
+      },
+      "errorResponse": {
+        "body": "#[error]",
+        "status": 500
+      }
+    },
+    {
+      "implementor": "com.reedelk.core.component.LoggerComponent",
+      "description": "Log message attributes",
+      "level": "INFO",
+      "message": "#[message.attributes()]"
+    },
+    {
+      "implementor": "com.reedelk.core.component.ScriptEvaluator",
+      "description": "Concatenate 'Hello World' with 'name' path parameter",
+      "mimeType": "text/plain",
+      "script": "helloWorld.js"
+    }
+  ]
+}
