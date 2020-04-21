@@ -26,14 +26,15 @@
       "message": "#[message.attributes()]"
     },
     {
-      "implementor": "com.reedelk.core.component.ScriptEvaluator",
-      "description": "Concatenate 'Hello World' with 'name' path parameter",
-      "mimeType": "text/plain",
-      "script": "helloWorld.js"
+      "implementor": "com.reedelk.google.drive.component.FileCreate",
+      "description": "Google File Create",
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
+      "name": "my_file_super_test.txt"
     },
     {
-      "implementor": "com.reedelk.google.drive.component.FileCreate",
-      "description": "Google File Create"
+      "implementor": "com.reedelk.google.drive.component.PermissionCreate",
+      "description": "Google Permission Create",
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
     }
   ]
 }
