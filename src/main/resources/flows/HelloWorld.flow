@@ -30,6 +30,10 @@
       "description": "Concatenate 'Hello World' with 'name' path parameter",
       "mimeType": "text/plain",
       "script": "helloWorld.js"
+    },
+    {
+      "implementor": "com.reedelk.google.drive.component.FileCreate",
+      "description": "Google File Create"
     }
   ]
 }

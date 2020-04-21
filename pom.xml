@@ -13,7 +13,7 @@
 
     <packaging>bundle</packaging>
     <version>0.9.1-SNAPSHOT</version>
-    <artifactId>module-google-doc</artifactId>
+    <artifactId>module-google-drive</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
