@@ -44,20 +44,28 @@ public class FileList implements ProcessorSync {
     private String driveId;
 
     @Property("Page Size")
+    @Group("Paging")
     @Hint("30")
     @Example("50")
     @DefaultValue("100")
     @Description("The maximum number of files to return per page. " +
             "Partial or empty result pages are possible even before the end of the files " +
-            "list has been reached. Acceptable values are 1 to 1000, inclusive. (Default: 100)")
+            "list has been reached. Acceptable values are 1 to 1000, inclusive.")
     private Integer pageSize;
 
     @Property("Page Token")
+    @Group("Paging")
+    @InitValue("#[message.attributes().nextPageToken]")
+    @DefaultValue("#[message.attributes().nextPageToken]")
+    @Hint("Use a dynamic value to set next page token: message.attributes().nextPageToken")
+    @Example("<code>message.attributes().nextPageToken</code>")
     @Description("The token for continuing a previous list request on the next page. " +
             "This should be set to the value of 'nextPageToken' from the previous response.")
-    private DynamicString pageToken;
+    @When(propertyName = "pageSize", propertyValue = When.NOT_BLANK)
+    private DynamicString nextPageToken;
 
     @Property("Filter Query")
+    @Group("Filter And Order")
     @Hint("name contains 'hello' and name contains 'goodbye'")
     @Example("<br>The following examples shows some basic query strings which can be used in this property:" +
             "<table style=\"width:100%\">" +
@@ -82,7 +90,7 @@ public class FileList implements ProcessorSync {
     private String query;
 
     @Property("Order By")
-    @InitValue("name")
+    @Group("Filter And Order")
     @Hint("folder,modifiedTime desc,name")
     @Example("folder,modifiedTime desc,name")
     @Description("A comma-separated list of sort keys. " +
@@ -109,7 +117,7 @@ public class FileList implements ProcessorSync {
 
             Drive.Files.List list = drive.files().list();
             list.setPageSize(realPageSize);
-            scriptEngine.evaluate(pageToken, flowContext, message)
+            scriptEngine.evaluate(nextPageToken, flowContext, message)
                     .ifPresent(list::setPageToken);
             if (isNotBlank(driveId)) list.setDriveId(driveId);
             if (isNotBlank(orderBy)) list.setOrderBy(orderBy);
@@ -143,8 +151,8 @@ public class FileList implements ProcessorSync {
         this.pageSize = pageSize;
     }
 
-    public void setPageToken(DynamicString pageToken) {
-        this.pageToken = pageToken;
+    public void setNextPageToken(DynamicString nextPageToken) {
+        this.nextPageToken = nextPageToken;
     }
 
     public void setQuery(String query) {

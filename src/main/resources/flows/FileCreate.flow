@@ -31,7 +31,8 @@
       "description": "Google Permission Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
       "fileId": "#[message.payload()]",
-      "type": "GROUP"
+      "type": "GROUP",
+      "emailAddress": "gironi.lorenzo@gmail.com"
     }
   ]
 }
