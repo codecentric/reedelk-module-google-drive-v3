@@ -29,6 +29,10 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 public class PermissionList implements ProcessorSync {
 
     @Property("Configuration")
+    @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
+            "This component requires the configuration of a Service Account to make authorized API calls " +
+            "on behalf of the user. More info about Service Accounts and how they can be configured can " +
+            "be found at the following <a href=\"https://cloud.google.com/iam/docs/service-accounts\">link</a>.")
     private DriveConfiguration configuration;
 
     @Property("File ID")

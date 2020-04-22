@@ -39,6 +39,7 @@ public class DriveService {
             // Build a new authorized API client service.
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             Credentials credentials = getCredentials(configuration);
+
             HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
             return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, requestInitializer)
                     .setApplicationName(implementor.getSimpleName())

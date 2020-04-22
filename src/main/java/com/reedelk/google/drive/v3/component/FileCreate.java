@@ -6,10 +6,7 @@ import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveService;
 import com.reedelk.google.drive.v3.internal.commons.Utils;
 import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
-import com.reedelk.runtime.api.annotation.DefaultValue;
-import com.reedelk.runtime.api.annotation.MimeTypeCombo;
-import com.reedelk.runtime.api.annotation.ModuleComponent;
-import com.reedelk.runtime.api.annotation.Property;
+import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -33,6 +30,10 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 public class FileCreate implements ProcessorSync {
 
     @Property("Configuration")
+    @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
+            "This component requires the configuration of a Service Account to make authorized API calls " +
+            "on behalf of the user. More info about Service Accounts and how they can be configured can " +
+            "be found at the following <a href=\"https://cloud.google.com/iam/docs/service-accounts\">link</a>.")
     private DriveConfiguration configuration;
 
     @Property("File name")
@@ -74,7 +75,6 @@ public class FileCreate implements ProcessorSync {
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-
         ByteArrayContent byteArrayContent =
                 new ByteArrayContent(fileMimeType.toString(), fileContent);
 
@@ -95,16 +95,16 @@ public class FileCreate implements ProcessorSync {
                 .build();
     }
 
+    public void setFileDescription(DynamicString fileDescription) {
+        this.fileDescription = fileDescription;
+    }
+
     public void setConfiguration(DriveConfiguration configuration) {
         this.configuration = configuration;
     }
 
     public void setFileName(DynamicString fileName) {
         this.fileName = fileName;
-    }
-
-    public void setFileDescription(DynamicString fileDescription) {
-        this.fileDescription = fileDescription;
     }
 
     public void setMimeType(String mimeType) {

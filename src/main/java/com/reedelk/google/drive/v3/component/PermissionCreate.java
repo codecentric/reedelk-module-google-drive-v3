@@ -3,7 +3,6 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.internal.DriveService;
-import com.reedelk.google.drive.v3.internal.commons.PermissionUtils;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -20,8 +19,8 @@ import org.osgi.service.component.annotations.Reference;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.*;
-import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNullOrBlank;
+import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.checkPreconditions;
+import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.createPermission;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -30,6 +29,10 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 public class PermissionCreate implements ProcessorSync {
 
     @Property("Configuration")
+    @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
+            "This component requires the configuration of a Service Account to make authorized API calls " +
+            "on behalf of the user. More info about Service Accounts and how they can be configured can " +
+            "be found at the following <a href=\"https://cloud.google.com/iam/docs/service-accounts\">link</a>.")
     private DriveConfiguration configuration;
 
     @Property("File ID")
@@ -145,5 +148,4 @@ public class PermissionCreate implements ProcessorSync {
     public void setType(PermissionType type) {
         this.type = type;
     }
-
 }
