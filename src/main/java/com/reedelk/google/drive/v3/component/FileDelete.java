@@ -30,7 +30,7 @@ public class FileDelete implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
-    @Description("The ID of the file or shared drive we want to create this permission for. " +
+    @Description("The ID of the file we want to delete. " +
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;
 

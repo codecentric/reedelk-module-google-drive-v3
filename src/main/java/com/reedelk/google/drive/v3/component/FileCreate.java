@@ -90,11 +90,15 @@ public class FileCreate implements ProcessorSync {
                 .build();
     }
 
+    public void setConfiguration(DriveConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
     public void setName(DynamicString name) {
         this.name = name;
     }
 
-    public void setConfiguration(DriveConfiguration configuration) {
-        this.configuration = configuration;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

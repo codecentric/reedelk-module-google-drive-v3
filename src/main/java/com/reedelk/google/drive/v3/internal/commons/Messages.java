@@ -24,4 +24,13 @@ public class Messages {
             return message;
         }
     }
+
+    public enum FileRead implements FormattedMessage {
+        ;
+
+        @Override
+        public String template() {
+            return null;
+        }
+    }
 }
