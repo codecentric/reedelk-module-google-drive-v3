@@ -2,7 +2,7 @@ package com.reedelk.google.drive.component;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
-import com.reedelk.google.drive.internal.DriveServiceProvider;
+import com.reedelk.google.drive.internal.DriveService;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -18,6 +18,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 
+import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNullOrBlank;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -71,14 +72,14 @@ public class PermissionCreate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        DriveServiceProvider provider = new DriveServiceProvider();
-        this.drive = provider.get(FileCreate.class, configuration);
-
+        drive = DriveService.create(PermissionCreate.class, configuration);
+        checkPreconditions();
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
         Permission userPermission = createPermission(flowContext, message);
+
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
@@ -91,12 +92,17 @@ public class PermissionCreate implements ProcessorSync {
         }
 
         try {
-            Permission result = drive.permissions()
-                    .create(realFileId, userPermission)
-                    .execute();
+            Drive.Permissions.Create create = drive.permissions()
+                    .create(realFileId, userPermission);
+
+            if (PermissionRole.OWNER.equals(role)) {
+                // This flag is mandatory when assigning an 'Owner' permission role.
+                create.setTransferOwnership(true);
+            }
+
+            Permission result = create.execute();
 
             String permissionId = result.getId();
-
             return MessageBuilder.get(PermissionCreate.class)
                     .withString(permissionId, MimeType.TEXT_PLAIN)
                     .build();
@@ -111,7 +117,6 @@ public class PermissionCreate implements ProcessorSync {
         role.set(userPermission);
         type.set(userPermission);
 
-        // TODO: Add extra check on INIT.
         if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
             // emailAddress is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
             String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message)
@@ -125,6 +130,17 @@ public class PermissionCreate implements ProcessorSync {
             userPermission.setDomain(evaluatedDomain);
         }
         return userPermission;
+    }
+
+    private void checkPreconditions() {
+        if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
+            requireNotNullOrBlank(PermissionCreate.class, emailAddress,
+                    "Email Address must not be empty when permission type is user or group.");
+        }
+        if (PermissionType.DOMAIN.equals(type)) {
+            requireNotNullOrBlank(PermissionCreate.class, domain,
+                    "Domain must not be empty when permission type is domain.");
+        }
     }
 
     public void setConfiguration(DriveConfiguration configuration) {

@@ -1,8 +1,9 @@
 package com.reedelk.google.drive.component;
 
-import com.reedelk.core.component.ResourceReadText;
+import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.Property;
 import com.reedelk.runtime.api.annotation.Shared;
+import com.reedelk.runtime.api.annotation.WidthAuto;
 import com.reedelk.runtime.api.component.Implementor;
 import com.reedelk.runtime.api.resource.ResourceText;
 import org.osgi.service.component.annotations.Component;
@@ -17,8 +18,13 @@ public class DriveConfiguration implements Implementor {
 
     // TODO: This one should be from config? Or a system property?
     //  or a config property?
+    @WidthAuto
     @Property("Service Account Credentials")
     private ResourceText credentials;
+
+    @Property("Service User Email")
+    @Description("The email of the user account to impersonate, if delegating domain-wide authority to the service account.")
+    private String serviceAccountEmail;
 
     public String getApplicationName() {
         return applicationName;
@@ -34,5 +40,13 @@ public class DriveConfiguration implements Implementor {
 
     public void setCredentials(ResourceText credentials) {
         this.credentials = credentials;
+    }
+
+    public String getServiceAccountEmail() {
+        return serviceAccountEmail;
+    }
+
+    public void setServiceAccountEmail(String serviceAccountEmail) {
+        this.serviceAccountEmail = serviceAccountEmail;
     }
 }

@@ -12,6 +12,7 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.reedelk.google.drive.component.DriveConfiguration;
 import com.reedelk.runtime.api.commons.StreamUtils;
+import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.component.Implementor;
 import com.reedelk.runtime.api.exception.PlatformException;
 import com.reedelk.runtime.api.resource.ResourceText;
@@ -22,18 +23,20 @@ import java.security.GeneralSecurityException;
 
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
 
-public class DriveServiceProvider {
+public class DriveService {
+
+    private DriveService() {
+    }
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-    public Drive get(Class<? extends Implementor> implementor, DriveConfiguration configuration) {
+    public static Drive create(Class<? extends Implementor> implementor, DriveConfiguration configuration) {
         requireNotNull(implementor, configuration, "Google Drive Configuration must be provided.");
 
         try {
             // Build a new authorized API client service.
-            ResourceText credentialsResource = configuration.getCredentials();
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            Credentials credentials = getCredentials(credentialsResource);
+            Credentials credentials = getCredentials(configuration);
             HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
             return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, requestInitializer)
                     .setApplicationName(implementor.getSimpleName())
@@ -43,11 +46,18 @@ public class DriveServiceProvider {
         }
     }
 
-    private static Credentials getCredentials(ResourceText credentialsResource) throws IOException, GeneralSecurityException {
+    private static Credentials getCredentials(DriveConfiguration configuration) throws IOException, GeneralSecurityException {
+        ResourceText credentialsResource = configuration.getCredentials();
+        String serviceAccountEmail = configuration.getServiceAccountEmail();
         String credentialsAsJson = StreamUtils.FromString.consume(credentialsResource.data());
-        return ServiceAccountCredentials.fromStream(new StringBufferInputStream(credentialsAsJson))
+        ServiceAccountCredentials.Builder builder = ServiceAccountCredentials.fromStream(new StringBufferInputStream(credentialsAsJson))
                 .toBuilder()
-                .setScopes(DriveScopes.all())
-                .build();
+                .setScopes(DriveScopes.all());
+        if (StringUtils.isNotBlank(serviceAccountEmail)) {
+            // The email of the user account to impersonate,
+            // if delegating domain-wide authority to the service account.
+            builder.setServiceAccountUser(serviceAccountEmail);
+        }
+        return builder.build();
     }
 }

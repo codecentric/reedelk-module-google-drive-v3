@@ -7,8 +7,8 @@
       "implementor": "com.reedelk.rest.component.RESTListener",
       "description": "GET Hello World REST Listener",
       "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
-      "path": "/message/{name:.*}",
-      "method": "GET",
+      "path": "/create",
+      "method": "POST",
       "streaming": "AUTO",
       "response": {
         "body": "#[message.payload()]",
@@ -20,21 +20,19 @@
       }
     },
     {
-      "implementor": "com.reedelk.core.component.LoggerComponent",
-      "description": "Log message attributes",
-      "level": "INFO",
-      "message": "#[message.attributes()]"
-    },
-    {
       "implementor": "com.reedelk.google.drive.component.FileCreate",
       "description": "Google File Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
-      "name": "my_file_super_test.txt"
+      "name": "my_file_to_create_test.txt",
+      "mimeType": "text/plain"
     },
     {
       "implementor": "com.reedelk.google.drive.component.PermissionCreate",
       "description": "Google Permission Create",
-      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
+      "fileId": "#[message.payload()]",
+      "role": "OWNER",
+      "emailAddress": "gironi.lorenzo@gmail.com"
     }
   ]
 }

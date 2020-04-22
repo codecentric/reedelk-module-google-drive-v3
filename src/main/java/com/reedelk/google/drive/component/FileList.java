@@ -3,7 +3,7 @@ package com.reedelk.google.drive.component;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.User;
-import com.reedelk.google.drive.internal.DriveServiceProvider;
+import com.reedelk.google.drive.internal.DriveService;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
 import com.reedelk.runtime.api.annotation.Property;
 import com.reedelk.runtime.api.component.ProcessorSync;
@@ -34,8 +34,7 @@ public class FileList implements ProcessorSync {
 
     @Override
     public void initialize() {
-        DriveServiceProvider provider = new DriveServiceProvider();
-        this.drive = provider.get(FileList.class, configuration);
+        this.drive = DriveService.create(FileList.class, configuration);
     }
 
     @Override
