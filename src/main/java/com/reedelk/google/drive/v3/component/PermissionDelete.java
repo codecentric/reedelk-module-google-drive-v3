@@ -1,4 +1,4 @@
-package com.reedelk.google.drive.component;
+package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.runtime.api.annotation.ModuleComponent;
 import com.reedelk.runtime.api.component.ProcessorSync;
@@ -8,10 +8,9 @@ import org.osgi.service.component.annotations.Component;
 
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google Permission Update")
-@Component(service = PermissionUpdate.class, scope = PROTOTYPE)
-public class PermissionUpdate implements ProcessorSync {
-
+@ModuleComponent("Google Permission Delete")
+@Component(service = PermissionDelete.class, scope = PROTOTYPE)
+public class PermissionDelete implements ProcessorSync {
     @Override
     public Message apply(FlowContext flowContext, Message message) {
         return null;

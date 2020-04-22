@@ -1,4 +1,4 @@
-package com.reedelk.google.drive.internal;
+package com.reedelk.google.drive.v3.internal;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -10,7 +10,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.auth.Credentials;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.reedelk.google.drive.component.DriveConfiguration;
+import com.reedelk.google.drive.v3.component.DriveConfiguration;
 import com.reedelk.runtime.api.commons.StreamUtils;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.component.Implementor;

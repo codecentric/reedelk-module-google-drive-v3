@@ -1,4 +1,4 @@
-package com.reedelk.google.drive.component;
+package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.runtime.api.annotation.DisplayName;

@@ -1,11 +1,11 @@
-package com.reedelk.google.drive.component;
+package com.reedelk.google.drive.v3.component;
 
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.reedelk.google.drive.internal.DriveService;
-import com.reedelk.google.drive.internal.commons.Utils;
-import com.reedelk.google.drive.internal.exception.FileCreateException;
+import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.commons.Utils;
+import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
 import com.reedelk.runtime.api.annotation.DefaultValue;
 import com.reedelk.runtime.api.annotation.MimeTypeCombo;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
@@ -23,8 +23,8 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 
-import static com.reedelk.google.drive.internal.commons.Messages.FileCreate.FILE_NAME_EMPTY;
-import static com.reedelk.google.drive.internal.commons.Messages.FileCreate.GENERIC_ERROR;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileCreate.FILE_NAME_EMPTY;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileCreate.GENERIC_ERROR;
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 

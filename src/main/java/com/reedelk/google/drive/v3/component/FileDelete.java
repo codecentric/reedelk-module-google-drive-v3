@@ -1,8 +1,8 @@
-package com.reedelk.google.drive.component;
+package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.internal.DriveService;
-import com.reedelk.google.drive.internal.exception.FileDeleteException;
+import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
 import com.reedelk.runtime.api.annotation.Property;

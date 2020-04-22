@@ -1,10 +1,10 @@
-package com.reedelk.google.drive.component;
+package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.User;
-import com.reedelk.google.drive.internal.DriveService;
-import com.reedelk.google.drive.internal.commons.Default;
+import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.commons.Default;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.exception.PlatformException;

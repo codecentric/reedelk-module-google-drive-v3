@@ -1,4 +1,4 @@
-package com.reedelk.google.drive.component;
+package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.Property;

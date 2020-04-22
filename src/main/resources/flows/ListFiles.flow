@@ -20,7 +20,7 @@
       }
     },
     {
-      "implementor": "com.reedelk.google.drive.component.FileList",
+      "implementor": "com.reedelk.google.drive.v3.component.FileList",
       "description": "Google File List",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
     },

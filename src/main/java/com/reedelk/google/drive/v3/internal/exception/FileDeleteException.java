@@ -1,4 +1,4 @@
-package com.reedelk.google.drive.internal.exception;
+package com.reedelk.google.drive.v3.internal.exception;
 
 import com.reedelk.runtime.api.exception.PlatformException;
 
