@@ -32,7 +32,7 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 @Component(service = FileCreate.class, scope = PROTOTYPE)
 public class FileCreate implements ProcessorSync {
 
-    @Property("Drive Configuration")
+    @Property("Configuration")
     private DriveConfiguration configuration;
 
     @Property("File name")
