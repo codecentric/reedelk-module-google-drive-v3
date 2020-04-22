@@ -30,7 +30,8 @@
       "implementor": "com.reedelk.google.drive.v3.component.PermissionCreate",
       "description": "Google Permission Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
-      "fileId": "#[message.payload()]"
+      "fileId": "#[message.payload()]",
+      "type": "GROUP"
     }
   ]
 }
