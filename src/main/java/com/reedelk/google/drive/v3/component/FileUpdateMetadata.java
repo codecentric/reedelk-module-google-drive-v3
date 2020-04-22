@@ -35,10 +35,10 @@ public class FileUpdateMetadata implements ProcessorSync {
     private DynamicString fileId;
 
     @Property("File Name")
-    private DynamicString name;
+    private DynamicString fileName;
 
     @Property("File Description")
-    private DynamicString description;
+    private DynamicString fileDescription;
 
     @Reference
     private ScriptEngineService scriptEngine;
@@ -58,8 +58,8 @@ public class FileUpdateMetadata implements ProcessorSync {
                 .orElseThrow(() -> new FileUpdateException("File ID must not be null."));
 
         File fileMetadata = new File();
-        scriptEngine.evaluate(name, flowContext, message).ifPresent(fileMetadata::setName);
-        scriptEngine.evaluate(description, flowContext, message).ifPresent(fileMetadata::setDescription);
+        scriptEngine.evaluate(fileName, flowContext, message).ifPresent(fileMetadata::setName);
+        scriptEngine.evaluate(fileDescription, flowContext, message).ifPresent(fileMetadata::setDescription);
 
         File updatedFile;
         try {
@@ -83,5 +83,13 @@ public class FileUpdateMetadata implements ProcessorSync {
 
     public void setFileId(DynamicString fileId) {
         this.fileId = fileId;
+    }
+
+    public void setFileName(DynamicString fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setFileDescription(DynamicString fileDescription) {
+        this.fileDescription = fileDescription;
     }
 }

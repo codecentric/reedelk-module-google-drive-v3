@@ -17,8 +17,10 @@ import com.reedelk.runtime.api.component.Implementor;
 import com.reedelk.runtime.api.exception.PlatformException;
 import com.reedelk.runtime.api.resource.ResourceText;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringBufferInputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
@@ -49,8 +51,8 @@ public class DriveService {
     private static Credentials getCredentials(DriveConfiguration configuration) throws IOException, GeneralSecurityException {
         ResourceText credentialsResource = configuration.getCredentials();
         String serviceAccountEmail = configuration.getServiceAccountEmail();
-        String credentialsAsJson = StreamUtils.FromString.consume(credentialsResource.data());
-        ServiceAccountCredentials.Builder builder = ServiceAccountCredentials.fromStream(new StringBufferInputStream(credentialsAsJson))
+        String credentialsAsJson = StreamUtils.FromString.consume(credentialsResource.data());// TODO: Create a method (data as input stream in core API).
+        ServiceAccountCredentials.Builder builder = ServiceAccountCredentials.fromStream(new ByteArrayInputStream(credentialsAsJson.getBytes(StandardCharsets.UTF_8)))
                 .toBuilder()
                 .setScopes(DriveScopes.all());
         if (StringUtils.isNotBlank(serviceAccountEmail)) {

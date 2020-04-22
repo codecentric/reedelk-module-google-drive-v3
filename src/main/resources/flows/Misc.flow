@@ -1,0 +1,28 @@
+{
+  "id": "16a6df68-3867-4dfc-92ef-b8cfbf4e8c0c",
+  "title": "Misc",
+  "description": "Misc Flow",
+  "flow": [
+    {
+      "implementor": "com.reedelk.mail.component.IMAPMailListener",
+      "description": "Mail Listener (IMAP)"
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.FileCreate",
+      "mimeType": "text/plain"
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.FileDelete",
+      "description": "Google File Delete"
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.FileCreate",
+      "description": "sfsfs"
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.FileDelete",
+      "description": "Google File Delete"
+    },
+    {"implementor": "com.reedelk.google.drive.v3.component.FileCreate"}
+  ]
+}

@@ -36,10 +36,10 @@ public class FileCreate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File name")
-    private DynamicString name;
+    private DynamicString fileName;
 
     @Property("File description")
-    private DynamicString description;
+    private DynamicString fileDescription;
 
     @Property("Mime Type")
     @DefaultValue(MimeType.AsString.TEXT_PLAIN)
@@ -57,7 +57,7 @@ public class FileCreate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        requireNotNull(FileCreate.class, name, "Google Drive File name must not be empty.");
+        requireNotNull(FileCreate.class, fileName, "Google Drive File name must not be empty.");
         drive = DriveService.create(FileCreate.class, configuration);
         fileMimeType = MimeType.parse(mimeType, MimeType.TEXT_PLAIN);
     }
@@ -67,8 +67,8 @@ public class FileCreate implements ProcessorSync {
 
         File fileMetadata = new File();
 
-        scriptEngine.evaluate(name, flowContext, message).ifPresent(fileMetadata::setName);
-        scriptEngine.evaluate(description, flowContext, message).ifPresent(fileMetadata::setDescription);
+        scriptEngine.evaluate(fileName, flowContext, message).ifPresent(fileMetadata::setName);
+        scriptEngine.evaluate(fileDescription, flowContext, message).ifPresent(fileMetadata::setDescription);
 
         Object payload = message.payload();
 
@@ -99,12 +99,12 @@ public class FileCreate implements ProcessorSync {
         this.configuration = configuration;
     }
 
-    public void setName(DynamicString name) {
-        this.name = name;
+    public void setFileName(DynamicString fileName) {
+        this.fileName = fileName;
     }
 
-    public void setDescription(DynamicString description) {
-        this.description = description;
+    public void setFileDescription(DynamicString fileDescription) {
+        this.fileDescription = fileDescription;
     }
 
     public void setMimeType(String mimeType) {
