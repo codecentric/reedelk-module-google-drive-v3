@@ -1,13 +1,12 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.User;
 import com.reedelk.google.drive.v3.internal.DriveService;
 import com.reedelk.google.drive.v3.internal.commons.Default;
+import com.reedelk.google.drive.v3.internal.commons.Mappers;
+import com.reedelk.google.drive.v3.internal.exception.FileListException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
-import com.reedelk.runtime.api.exception.PlatformException;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageBuilder;
@@ -18,8 +17,9 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.reedelk.runtime.api.commons.StringUtils.isNotBlank;
 import static java.util.stream.Collectors.toList;
@@ -128,14 +128,16 @@ public class FileList implements ProcessorSync {
                     .execute();
             List<Map<String, Serializable>> mappedFiles = files.getFiles()
                     .stream()
-                    .map(FILE_MAPPER)
+                    .map(Mappers.FILE)
                     .collect(toList());
 
             return MessageBuilder.get(FileList.class)
                     .withJavaObject(mappedFiles)
                     .build();
+
         } catch (IOException exception) {
-            throw new PlatformException(exception);
+            String error = ""; // TODO: Test
+            throw new FileListException(error, exception);
         }
     }
 
@@ -162,33 +164,4 @@ public class FileList implements ProcessorSync {
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
     }
-
-    private final Function<File, Map<String, Serializable>> FILE_MAPPER = new Function<File, Map<String, Serializable>>() {
-        @Override
-        public Map<String, Serializable> apply(File file) {
-            Map<String, Serializable> map = new HashMap<>();
-            map.put("driveId", file.getDriveId());
-            map.put("fileExtension", file.getFileExtension());
-            map.put("id", file.getId());
-            map.put("description", file.getDescription());
-            map.put("name", file.getName());
-            map.put("originalFilename", file.getOriginalFilename());
-            map.put("ownedByMe", file.getOwnedByMe());
-
-            List<Map<String, Serializable>> collect = file.getOwners().stream().map(USER_MAPPER).collect(toList());
-            map.put("owners", new ArrayList<>(collect));
-            map.put("webViewLink", file.getWebViewLink());
-            map.put("webContentLink", file.getWebContentLink());
-            return map;
-        }
-    };
-
-    private final Function<User, Map<String, Serializable>> USER_MAPPER = new Function<User, Map<String, Serializable>>() {
-        @Override
-        public Map<String, Serializable> apply(User user) {
-            Map<String, Serializable> map = new HashMap<>();
-            map.put("emailAddress", user.getEmailAddress());
-            return map;
-        }
-    };
 }

@@ -4,7 +4,6 @@ import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveService;
-import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
@@ -20,12 +19,11 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 
-import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File Update")
-@Component(service = FileUpdate.class, scope = PROTOTYPE)
-public class FileUpdate implements ProcessorSync {
+@ModuleComponent("Google File Update Content")
+@Component(service = FileUpdateContent.class, scope = PROTOTYPE)
+public class FileUpdateContent implements ProcessorSync {
 
     @Property("Configuration")
     @Description("The Google Drive Configuration providing the Service Account Credentials file.")
@@ -40,7 +38,6 @@ public class FileUpdate implements ProcessorSync {
     @DefaultValue(MimeType.AsString.TEXT_PLAIN)
     @MimeTypeCombo
     private String mimeType;
-
 
     @Reference
     private ScriptEngineService scriptEngine;
@@ -69,9 +66,6 @@ public class FileUpdate implements ProcessorSync {
         ByteArrayContent byteArrayContent =
                 new ByteArrayContent(fileMimeType.toString(), fileContent);
 
-        
-
-        // TODO: If we also want to update the file name, then we need to set ti.
         File updatedFile;
         try {
             updatedFile = drive.files().update(realFileId, null, byteArrayContent)
@@ -82,7 +76,7 @@ public class FileUpdate implements ProcessorSync {
             throw new FileUpdateException(error, exception);
         }
 
-        return MessageBuilder.get(FileUpdate.class)
+        return MessageBuilder.get(FileUpdateContent.class)
                 .withString(updatedFile.getId(), MimeType.TEXT_PLAIN)
                 .build();
     }

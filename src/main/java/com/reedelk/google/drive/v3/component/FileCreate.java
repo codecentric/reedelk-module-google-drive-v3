@@ -22,8 +22,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
+import java.util.Optional;
 
-import static com.reedelk.google.drive.v3.internal.commons.Messages.FileCreate.FILE_NAME_EMPTY;
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileCreate.GENERIC_ERROR;
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
@@ -37,6 +37,9 @@ public class FileCreate implements ProcessorSync {
 
     @Property("File name")
     private DynamicString name;
+
+    @Property("File description")
+    private DynamicString description;
 
     @Property("Mime Type")
     @DefaultValue(MimeType.AsString.TEXT_PLAIN)
@@ -62,15 +65,16 @@ public class FileCreate implements ProcessorSync {
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
-        String fileName = scriptEngine.evaluate(name, flowContext, message)
-                .orElseThrow(() -> new FileCreateException(FILE_NAME_EMPTY.format(name.value())));
+        File fileMetadata = new File();
+
+        scriptEngine.evaluate(name, flowContext, message).ifPresent(fileMetadata::setName);
+        scriptEngine.evaluate(description, flowContext, message).ifPresent(fileMetadata::setDescription);
 
         Object payload = message.payload();
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-        File fileMetadata = new File();
-        fileMetadata.setName(fileName);
+
         ByteArrayContent byteArrayContent =
                 new ByteArrayContent(fileMimeType.toString(), fileContent);
 
@@ -80,7 +84,8 @@ public class FileCreate implements ProcessorSync {
                     .setFields(Utils.ALL_FIELDS)
                     .execute();
         } catch (IOException exception) {
-            String error = GENERIC_ERROR.format(fileName, exception.getMessage());
+            String actualFileName = Optional.ofNullable(fileMetadata.getName()).orElse("file name not set");
+            String error = GENERIC_ERROR.format(actualFileName, exception.getMessage());
             throw new FileCreateException(error, exception);
         }
 
@@ -96,6 +101,10 @@ public class FileCreate implements ProcessorSync {
 
     public void setName(DynamicString name) {
         this.name = name;
+    }
+
+    public void setDescription(DynamicString description) {
+        this.description = description;
     }
 
     public void setMimeType(String mimeType) {

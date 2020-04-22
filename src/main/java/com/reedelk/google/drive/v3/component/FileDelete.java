@@ -48,7 +48,6 @@ public class FileDelete implements ProcessorSync {
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-
         String realFileId;
         if (isNullOrBlank(fileId)) {
             // We take it from the message payload.
@@ -59,16 +58,14 @@ public class FileDelete implements ProcessorSync {
                     .orElseThrow(() -> new FileDeleteException("File ID must not be null."));
         }
 
-        Drive.Files.Delete delete;
         try {
-            delete = drive.files().delete(realFileId);
+            drive.files().delete(realFileId).execute();
         } catch (IOException e) {
             throw new FileDeleteException(e.getMessage(), e);
         }
 
-        String deletedFileId = delete.getFileId();
         return MessageBuilder.get(FileDelete.class)
-                .withString(deletedFileId, MimeType.TEXT_PLAIN)
+                .withString(realFileId, MimeType.TEXT_PLAIN)
                 .build();
     }
 }

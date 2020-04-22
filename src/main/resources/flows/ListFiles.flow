@@ -29,11 +29,6 @@
       "description": "Object to JSON",
       "indentFactor": 2,
       "prettyPrint": true
-    },
-    {
-      "implementor": "com.reedelk.google.drive.v3.component.FileList",
-      "description": "Google File List",
-      "orderBy": "name"
     }
   ]
 }

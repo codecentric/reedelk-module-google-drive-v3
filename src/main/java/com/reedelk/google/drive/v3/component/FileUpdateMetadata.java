@@ -1,77 +1,79 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveService;
-import com.reedelk.google.drive.v3.internal.commons.Mappers;
-import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
+import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
 import com.reedelk.runtime.api.annotation.Property;
 import com.reedelk.runtime.api.component.ProcessorSync;
-import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageBuilder;
+import com.reedelk.runtime.api.message.content.MimeType;
 import com.reedelk.runtime.api.script.ScriptEngineService;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
-import static java.util.stream.Collectors.toList;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google Permission List")
-@Component(service = PermissionList.class, scope = PROTOTYPE)
-public class PermissionList implements ProcessorSync {
+@ModuleComponent("Google File Update Metadata")
+@Component(service = FileUpdateMetadata.class, scope = PROTOTYPE)
+public class FileUpdateMetadata implements ProcessorSync {
 
     @Property("Configuration")
+    @Description("The Google Drive Configuration providing the Service Account Credentials file.")
     private DriveConfiguration configuration;
 
     @Property("File ID")
-    @Description("The ID of the file we want to list the permission. " +
+    @Description("The ID of the file we want to update metadata. " +
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;
 
-    private Drive drive;
+    @Property("File Name")
+    private DynamicString name;
+
+    @Property("File Description")
+    private DynamicString description;
 
     @Reference
     private ScriptEngineService scriptEngine;
-    @Reference
-    private ConverterService converterService;
+
+
+    private Drive drive;
 
     @Override
     public void initialize() {
-        drive = DriveService.create(PermissionDelete.class, configuration);
+        drive = DriveService.create(FileList.class, configuration);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
         String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                .orElseThrow(() -> new PermissionListException("File ID must not be null."));
+                .orElseThrow(() -> new FileUpdateException("File ID must not be null."));
 
-        com.google.api.services.drive.model.PermissionList list;
+        File fileMetadata = new File();
+        scriptEngine.evaluate(name, flowContext, message).ifPresent(fileMetadata::setName);
+        scriptEngine.evaluate(description, flowContext, message).ifPresent(fileMetadata::setDescription);
+
+        File updatedFile;
         try {
-            list = drive.permissions().list(realFileId)
+            updatedFile = drive.files().update(realFileId, fileMetadata)
                     .setFields("*")
                     .execute();
-        } catch (IOException e) {
-            throw new PermissionListException(e.getMessage(), e);
+
+        } catch (IOException exception) {
+            String error = ""; // TODO: Here
+            throw new FileUpdateException(error, exception);
         }
 
-        // TODO: Attributes maybe should add the file and permission id in the attributes?
-        List<Map> permissions = list.getPermissions()
-                .stream()
-                .map(Mappers.PERMISSION)
-                .collect(toList());
-
-        return MessageBuilder.get(FileDelete.class)
-                .withList(permissions, Map.class)
+        return MessageBuilder.get(FileUpdateContent.class)
+                .withString(updatedFile.getId(), MimeType.TEXT_PLAIN)
                 .build();
     }
 

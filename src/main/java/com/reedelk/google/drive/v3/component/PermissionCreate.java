@@ -3,6 +3,7 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.commons.PermissionUtils;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -17,7 +18,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
+import java.util.Optional;
 
+import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.*;
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNullOrBlank;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
@@ -63,6 +66,9 @@ public class PermissionCreate implements ProcessorSync {
     @When(propertyName = "type", propertyValue = "DOMAIN")
     private DynamicString domain;
 
+    @Property("Send Notification Email")
+    private Boolean sendNotificationEmail;
+
     private Drive drive;
 
     @Reference
@@ -70,16 +76,19 @@ public class PermissionCreate implements ProcessorSync {
     @Reference
     private ConverterService converterService;
 
+    private Boolean realSendNotificationEmail;
+
     @Override
     public void initialize() {
         drive = DriveService.create(PermissionCreate.class, configuration);
-        checkPreconditions();
+        checkPreconditions(role, type, emailAddress, domain);
+        this.realSendNotificationEmail = Optional.ofNullable(sendNotificationEmail).orElse(true);// TODO:Default value
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-        Permission userPermission = createPermission(flowContext, message);
-
+        Permission userPermission =
+                createPermission(scriptEngine, emailAddress, domain, role, type, flowContext, message);
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
@@ -93,7 +102,8 @@ public class PermissionCreate implements ProcessorSync {
 
         try {
             Drive.Permissions.Create create = drive.permissions()
-                    .create(realFileId, userPermission);
+                    .create(realFileId, userPermission)
+                    .setSendNotificationEmail(realSendNotificationEmail);
 
             if (PermissionRole.OWNER.equals(role)) {
                 // This flag is mandatory when assigning an 'Owner' permission role.
@@ -112,43 +122,20 @@ public class PermissionCreate implements ProcessorSync {
         }
     }
 
-    private Permission createPermission(FlowContext flowContext, Message message) {
-        Permission userPermission = new Permission();
-        role.set(userPermission);
-        type.set(userPermission);
-
-        if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
-            // emailAddress is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
-            String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message)
-                    .orElseThrow(() -> new PlatformException("Email address is mandatory when permission type is user or group"));
-            userPermission.setEmailAddress(evaluatedEmailAddress);
-
-        } else if (PermissionType.DOMAIN.equals(type)) {
-            // domain is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
-            String evaluatedDomain = scriptEngine.evaluate(domain, flowContext, message)
-                    .orElseThrow(() -> new PlatformException("Domain is mandatory when permission type is user or group"));
-            userPermission.setDomain(evaluatedDomain);
-        }
-        return userPermission;
-    }
-
-    private void checkPreconditions() {
-        if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
-            requireNotNullOrBlank(PermissionCreate.class, emailAddress,
-                    "Email Address must not be empty when permission type is user or group.");
-        }
-        if (PermissionType.DOMAIN.equals(type)) {
-            requireNotNullOrBlank(PermissionCreate.class, domain,
-                    "Domain must not be empty when permission type is domain.");
-        }
-    }
-
     public void setConfiguration(DriveConfiguration configuration) {
         this.configuration = configuration;
     }
 
+    public void setEmailAddress(DynamicString emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
     public void setFileId(DynamicString fileId) {
         this.fileId = fileId;
+    }
+
+    public void setDomain(DynamicString domain) {
+        this.domain = domain;
     }
 
     public void setRole(PermissionRole role) {
@@ -159,11 +146,4 @@ public class PermissionCreate implements ProcessorSync {
         this.type = type;
     }
 
-    public void setEmailAddress(DynamicString emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    public void setDomain(DynamicString domain) {
-        this.domain = domain;
-    }
 }
