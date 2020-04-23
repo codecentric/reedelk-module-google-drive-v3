@@ -25,14 +25,14 @@ import java.security.GeneralSecurityException;
 
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
 
-public class DriveService {
+public class DriveApiFactory {
 
-    private DriveService() {
+    private DriveApiFactory() {
     }
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-    public static Drive create(Class<? extends Implementor> implementor, DriveConfiguration configuration) {
+    public static DriveApi create(Class<? extends Implementor> implementor, DriveConfiguration configuration) {
         requireNotNull(implementor, configuration, "Google Drive Configuration must be provided.");
 
         try {
@@ -41,9 +41,11 @@ public class DriveService {
             Credentials credentials = getCredentials(configuration);
 
             HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
-            return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, requestInitializer)
+            Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, requestInitializer)
                     .setApplicationName(implementor.getSimpleName())
                     .build();
+
+            return new DriveApiImpl(service);
         } catch (IOException | GeneralSecurityException e) {
             throw new PlatformException(e);
         }

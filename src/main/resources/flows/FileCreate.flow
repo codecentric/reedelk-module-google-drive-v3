@@ -7,7 +7,7 @@
       "implementor": "com.reedelk.rest.component.RESTListener",
       "description": "GET Hello World REST Listener",
       "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
-      "path": "/create",
+      "path": "/create/{fileName}",
       "method": "POST",
       "streaming": "AUTO",
       "response": {
@@ -23,15 +23,17 @@
       "implementor": "com.reedelk.google.drive.v3.component.FileCreate",
       "description": "Google File Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
-      "mimeType": "text/plain"
+      "fileName": "#[message.attributes().pathParams.fileName]",
+      "autoMimeType": true
     },
     {
       "implementor": "com.reedelk.google.drive.v3.component.PermissionCreate",
       "description": "Google Permission Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
-      "fileId": "#[message.payload()]",
-      "type": "GROUP",
-      "emailAddress": ""
+      "fileId": "",
+      "role": "WRITER",
+      "type": "USER",
+      "emailAddress": "gironi.lorenzo@gmail.com"
     }
   ]
 }

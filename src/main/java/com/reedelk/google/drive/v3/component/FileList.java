@@ -1,7 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.commons.Default;
 import com.reedelk.google.drive.v3.internal.commons.Mappers;
 import com.reedelk.google.drive.v3.internal.exception.FileListException;
@@ -25,7 +25,7 @@ import static com.reedelk.runtime.api.commons.StringUtils.isNotBlank;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File List")
+@ModuleComponent("Drive Files List")
 @Description("The Google File List component lists or searches files from google drive. " +
         "Optional search filters and order by sort keys can be applied to filter and order the returned results. " +
         "If the number of returned files is potentially large it is recommended to use pagination by setting the page size and " +
@@ -110,7 +110,7 @@ public class FileList implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(FileList.class, configuration);
+        drive = DriveApiFactory.create(FileList.class, configuration);
         realPageSize = Optional.ofNullable(pageSize).orElse(Default.PAGE_SIZE);
     }
 

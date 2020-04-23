@@ -1,12 +1,12 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.client.http.ByteArrayContent;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.reedelk.google.drive.v3.internal.DriveService;
-import com.reedelk.google.drive.v3.internal.commons.Utils;
+import com.reedelk.google.drive.v3.internal.DriveApi;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.FileCreateAttributes;
 import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
 import com.reedelk.runtime.api.annotation.*;
+import com.reedelk.runtime.api.commons.MimeTypeUtils;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -18,80 +18,104 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import static com.reedelk.google.drive.v3.internal.commons.Messages.FileCreate.GENERIC_ERROR;
+import static com.reedelk.google.drive.v3.internal.commons.Default.CONTENT_AS_INDEXABLE_TEXT;
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
+import static java.util.Optional.ofNullable;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File Create")
+@ModuleComponent("Drive File Create")
 @Component(service = FileCreate.class, scope = PROTOTYPE)
+@Description("Creates a new file in Google Drive with the given name and optional description. " +
+        "This component requires the configuration of a Service Account to make authorized API calls " +
+        "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
+        "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
+        "More info about Service Accounts and how they can be created and configured can " +
+        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page. " +
+        "The content of the file is taken from the input message payload and if the file was successfully created " +
+        "the ID of the file is returned. The default file owner will be the provided Service Account and permissions " +
+        "on the file must be used to assign read/write permissions to other users. New permissions can be " +
+        "created using 'Google Permission Create' component.")
 public class FileCreate implements ProcessorSync {
 
     @Property("Configuration")
     @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
             "This component requires the configuration of a Service Account to make authorized API calls " +
-            "on behalf of the user. More info about Service Accounts and how they can be configured can " +
+            "on behalf of the user. More info about Service Accounts and how they can be created and configured can " +
             "be found at the following <a href=\"https://cloud.google.com/iam/docs/service-accounts\">link</a>.")
     private DriveConfiguration configuration;
 
     @Property("File name")
+    @Description("")
     private DynamicString fileName;
 
     @Property("File description")
     private DynamicString fileDescription;
 
-    @Property("Mime Type")
-    @DefaultValue(MimeType.AsString.TEXT_PLAIN)
+    @Property("Auto mime type")
+    @Example("true")
+    @InitValue("true")
+    @DefaultValue("false")
+    @Description("If true, the mime type of the payload is determined from the extension of the resource read.")
+    private boolean autoMimeType;
+
+    @Property("Mime type")
     @MimeTypeCombo
+    @Example(MimeType.AsString.IMAGE_JPEG)
+    @DefaultValue(MimeType.AsString.ANY)
+    @When(propertyName = "autoMimeType", propertyValue = "false")
+    @When(propertyName = "autoMimeType", propertyValue = When.BLANK)
+    @Description("The mime type of the file to be created on Google Drive.")
     private String mimeType;
 
-    private Drive drive;
+    @Property("Use content as indexable text")
+    @DefaultValue("false")
+    @Group("Indexing")
+    @Example("true")
+    @Description("Whether to use the uploaded content as indexable text.")
+    private Boolean indexableText;
 
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
-    private MimeType fileMimeType;
+    private DriveApi driveApi;
+
+    private boolean realIndexableText;
 
     @Override
     public void initialize() {
         requireNotNull(FileCreate.class, fileName, "Google Drive File name must not be empty.");
-        drive = DriveService.create(FileCreate.class, configuration);
-        fileMimeType = MimeType.parse(mimeType, MimeType.TEXT_PLAIN);
+        driveApi = DriveApiFactory.create(FileCreate.class, configuration);
+        realIndexableText = ofNullable(indexableText).orElse(CONTENT_AS_INDEXABLE_TEXT);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
-        File fileMetadata = new File();
+        String finalFileName = scriptEngine.evaluate(fileName, flowContext, message)
+                .orElseThrow(() -> new FileCreateException("File name must not be empty"));
 
-        scriptEngine.evaluate(fileName, flowContext, message).ifPresent(fileMetadata::setName);
-        scriptEngine.evaluate(fileDescription, flowContext, message).ifPresent(fileMetadata::setDescription);
+        String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message).orElse(null);
+
+        // TODO: Test what happens when the file extension is not given.
+        MimeType finalMimeType = MimeTypeUtils.mimeTypeFrom(autoMimeType, this.mimeType, finalFileName, MimeType.ANY);
 
         Object payload = message.payload();
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-        ByteArrayContent byteArrayContent =
-                new ByteArrayContent(fileMimeType.toString(), fileContent);
+        File file = driveApi.fileCreate(
+                finalFileName,
+                finalFileDescription,
+                finalMimeType,
+                realIndexableText,
+                fileContent);
 
-        File file;
-        try {
-            file = drive.files().create(fileMetadata, byteArrayContent)
-                    .setFields(Utils.ALL_FIELDS)
-                    .execute();
-        } catch (IOException exception) {
-            String actualFileName = Optional.ofNullable(fileMetadata.getName()).orElse("file name not set");
-            String error = GENERIC_ERROR.format(actualFileName, exception.getMessage());
-            throw new FileCreateException(error, exception);
-        }
-
-        String newFileId = file.getId();
+        FileCreateAttributes attributes = new FileCreateAttributes(file);
         return MessageBuilder.get(FileCreate.class)
-                .withString(newFileId, MimeType.TEXT_PLAIN)
+                .withString(file.getId(), MimeType.TEXT_PLAIN)
+                .attributes(attributes)
                 .build();
     }
 
@@ -103,11 +127,19 @@ public class FileCreate implements ProcessorSync {
         this.configuration = configuration;
     }
 
+    public void setAutoMimeType(boolean autoMimeType) {
+        this.autoMimeType = autoMimeType;
+    }
+
     public void setFileName(DynamicString fileName) {
         this.fileName = fileName;
     }
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    public void setIndexableText(Boolean indexableText) {
+        this.indexableText = indexableText;
     }
 }

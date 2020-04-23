@@ -3,7 +3,7 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File Update Content")
+@ModuleComponent("Drive File Update Content")
 @Component(service = FileUpdateContent.class, scope = PROTOTYPE)
 public class FileUpdateContent implements ProcessorSync {
 
@@ -52,7 +52,7 @@ public class FileUpdateContent implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(FileList.class, configuration);
+        drive = DriveApiFactory.create(FileList.class, configuration);
         fileMimeType = MimeType.parse(mimeType, MimeType.TEXT_PLAIN);
     }
 

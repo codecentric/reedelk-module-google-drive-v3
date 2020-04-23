@@ -2,7 +2,7 @@ package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
@@ -21,7 +21,7 @@ import java.io.IOException;
 
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File Update Metadata")
+@ModuleComponent("Drive File Update Metadata")
 @Component(service = FileUpdateMetadata.class, scope = PROTOTYPE)
 public class FileUpdateMetadata implements ProcessorSync {
 
@@ -51,7 +51,7 @@ public class FileUpdateMetadata implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(FileList.class, configuration);
+        drive = DriveApiFactory.create(FileList.class, configuration);
     }
 
     @Override

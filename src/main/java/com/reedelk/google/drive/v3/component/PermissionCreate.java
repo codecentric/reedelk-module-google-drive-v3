@@ -2,7 +2,7 @@ package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -24,7 +24,7 @@ import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.creat
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google Permission Create")
+@ModuleComponent("Drive Permission Create")
 @Component(service = PermissionCreate.class, scope = PROTOTYPE)
 public class PermissionCreate implements ProcessorSync {
 
@@ -83,7 +83,7 @@ public class PermissionCreate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(PermissionCreate.class, configuration);
+        drive = DriveApiFactory.create(PermissionCreate.class, configuration);
         checkPreconditions(role, type, emailAddress, domain);
         this.realSendNotificationEmail = Optional.ofNullable(sendNotificationEmail).orElse(true);// TODO:Default value
     }

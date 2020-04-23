@@ -2,7 +2,7 @@ package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.commons.PermissionUtils;
 import com.reedelk.google.drive.v3.internal.exception.PermissionDeleteException;
 import com.reedelk.runtime.api.annotation.*;
@@ -24,7 +24,7 @@ import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.creat
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google Permission Update")
+@ModuleComponent("Drive Permission Update")
 @Component(service = PermissionUpdate.class, scope = PROTOTYPE)
 public class PermissionUpdate implements ProcessorSync {
 
@@ -83,7 +83,7 @@ public class PermissionUpdate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(PermissionUpdate.class, configuration);
+        drive = DriveApiFactory.create(PermissionUpdate.class, configuration);
         PermissionUtils.checkPreconditions(role, type, emailAddress, domain);
     }
 

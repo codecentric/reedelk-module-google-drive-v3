@@ -1,7 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.exception.PermissionDeleteException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google Permission Delete")
+@ModuleComponent("Drive Permission Delete")
 @Component(service = PermissionDelete.class, scope = PROTOTYPE)
 public class PermissionDelete implements ProcessorSync {
 
@@ -52,7 +52,7 @@ public class PermissionDelete implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(PermissionDelete.class, configuration);
+        drive = DriveApiFactory.create(PermissionDelete.class, configuration);
     }
 
     @Override

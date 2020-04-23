@@ -1,7 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.commons.Mappers;
 import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
 import com.reedelk.runtime.api.annotation.Description;
@@ -24,7 +24,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google Permission List")
+@ModuleComponent("Drive Permissions List")
 @Component(service = PermissionList.class, scope = PROTOTYPE)
 public class PermissionList implements ProcessorSync {
 
@@ -49,7 +49,7 @@ public class PermissionList implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(PermissionDelete.class, configuration);
+        drive = DriveApiFactory.create(PermissionDelete.class, configuration);
     }
 
     @SuppressWarnings("rawtypes")

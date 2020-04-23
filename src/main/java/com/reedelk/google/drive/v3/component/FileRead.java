@@ -1,7 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.google.drive.v3.internal.exception.FileReadException;
 import com.reedelk.runtime.api.annotation.*;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File Read")
+@ModuleComponent("Drive File Read")
 @Component(service = FileRead.class, scope = PROTOTYPE)
 public class FileRead implements ProcessorSync {
 
@@ -54,7 +54,7 @@ public class FileRead implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(FileList.class, configuration);
+        drive = DriveApiFactory.create(FileList.class, configuration);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.v3.internal.DriveService;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Google File Delete")
+@ModuleComponent("Drive File Delete")
 @Component(service = FileDelete.class, scope = PROTOTYPE)
 public class FileDelete implements ProcessorSync {
 
@@ -47,7 +47,7 @@ public class FileDelete implements ProcessorSync {
 
     @Override
     public void initialize() {
-        drive = DriveService.create(FileDelete.class, configuration);
+        drive = DriveApiFactory.create(FileDelete.class, configuration);
     }
 
     @Override
