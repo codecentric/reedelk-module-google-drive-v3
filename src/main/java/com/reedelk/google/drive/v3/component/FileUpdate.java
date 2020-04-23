@@ -2,12 +2,10 @@ package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.attribute.FileDeleteAttributes;
-import com.reedelk.google.drive.v3.internal.command.FileDeleteCommand;
-import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
-import com.reedelk.runtime.api.annotation.Description;
-import com.reedelk.runtime.api.annotation.ModuleComponent;
-import com.reedelk.runtime.api.annotation.Property;
+import com.reedelk.google.drive.v3.internal.attribute.FileUpdateAttributes;
+import com.reedelk.google.drive.v3.internal.command.FileUpdateCommand;
+import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
+import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -19,20 +17,20 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Drive File Delete")
-@Component(service = FileDelete.class, scope = PROTOTYPE)
-@Description("Deletes a file with the given file ID from Google Drive. " +
-        "The ID of the file is taken from the input message payload if not defined in the 'File ID' property. " +
-        "A dynamic expression can be used to dynamically evaluate the file ID. " +
+@ModuleComponent("Drive File Update")
+@Component(service = FileUpdate.class, scope = PROTOTYPE)
+@Description("Updates the content of the file with the given file ID in Google Drive. " +
+        "The 'File ID' property is mandatory and a dynamic expression can be used to dynamically evaluate the file ID. " +
+        "The updated content of the file to update is taken from the input message payload and if the file was successfully created " +
+        "the ID of the file is returned in the output message payload. " +
         "This component requires the configuration of a Service Account to make authorized API calls " +
         "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
         "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
         "More info about Service Accounts and how they can be created and configured can " +
         "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
-public class FileDelete implements ProcessorSync {
+public class FileUpdate implements ProcessorSync {
 
     @Property("Configuration")
     @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
@@ -42,40 +40,48 @@ public class FileDelete implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
-    @Description("The ID of the file to delete. If not defined, the file ID is taken from the message payload.")
+    @Description("The ID of the file we want to update. The file ID is mandatory.")
     private DynamicString fileId;
+
+    @Property("Mime type")
+    @MimeTypeCombo
+    @Example(MimeType.AsString.TEXT_PLAIN)
+    @DefaultValue(MimeType.AsString.APPLICATION_BINARY)
+    @Description("The mime type of the file to be updated on Google Drive.")
+    private String mimeType;
 
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
+    private MimeType targetMimeType;
+
     private DriveApi driveApi;
 
     @Override
     public void initialize() {
-        driveApi = DriveApiFactory.create(FileDelete.class, configuration);
+        driveApi = DriveApiFactory.create(FileUpdate.class, configuration);
+        targetMimeType = MimeType.parse(mimeType, MimeType.TEXT_PLAIN);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-        String realFileId;
-        if (isNullOrBlank(fileId)) {
-            // We take it from the message payload.
-            Object payload = message.payload(); // The payload might not be a string.
-            realFileId = converterService.convert(payload, String.class); // TODO: The ID must not be null add a check here.
-        } else {
-            realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                    .orElseThrow(() -> new FileDeleteException("File ID must not be null."));
-        }
 
-        FileDeleteCommand command = new FileDeleteCommand(realFileId);
+        String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
+                .orElseThrow(() -> new FileUpdateException("File ID must not be null."));
+
+        Object payload = message.payload();
+
+        byte[] fileContent = converterService.convert(payload, byte[].class);
+
+        FileUpdateCommand command = new FileUpdateCommand(realFileId, targetMimeType, fileContent);
 
         driveApi.execute(command);
 
-        FileDeleteAttributes attributes = new FileDeleteAttributes(realFileId);
+        FileUpdateAttributes attributes = new FileUpdateAttributes(realFileId);
 
-        return MessageBuilder.get(FileDelete.class)
+        return MessageBuilder.get(FileUpdate.class)
                 .withString(realFileId, MimeType.TEXT_PLAIN)
                 .attributes(attributes)
                 .build();
@@ -87,5 +93,9 @@ public class FileDelete implements ProcessorSync {
 
     public void setFileId(DynamicString fileId) {
         this.fileId = fileId;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

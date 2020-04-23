@@ -1,8 +1,10 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionUpdateAttribute;
+import com.reedelk.google.drive.v3.internal.command.PermissionUpdateCommand;
 import com.reedelk.google.drive.v3.internal.commons.PermissionUtils;
 import com.reedelk.google.drive.v3.internal.exception.PermissionDeleteException;
 import com.reedelk.runtime.api.annotation.*;
@@ -18,9 +20,6 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.IOException;
-
-import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.createPermission;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -74,23 +73,21 @@ public class PermissionUpdate implements ProcessorSync {
     @When(propertyName = "type", propertyValue = "DOMAIN")
     private DynamicString domain;
 
-    private Drive drive;
-
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
+    private DriveApi driveApi;
+
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(PermissionUpdate.class, configuration);
+        driveApi = DriveApiFactory.create(PermissionUpdate.class, configuration);
         PermissionUtils.checkPreconditions(role, type, emailAddress, domain);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-        Permission updatedPermission =
-                createPermission(scriptEngine, emailAddress, domain, role, type, flowContext, message);
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
@@ -112,25 +109,21 @@ public class PermissionUpdate implements ProcessorSync {
                     .orElseThrow(() -> new PermissionDeleteException("Permission ID must not be null."));
         }
 
-        Permission result;
-        try {
-            Drive.Permissions.Update update = drive.permissions()
-                    .update(realFileId, realPermissionId, updatedPermission);
+        String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message).orElse(null);
+        String evaluatedDomain = scriptEngine.evaluate(domain, flowContext, message).orElse(null);
 
-            if (PermissionRole.OWNER.equals(role)) {
-                // This flag is mandatory when assigning an 'Owner' permission role.
-                update.setTransferOwnership(true);
-            }
+        PermissionUpdateCommand command =
+                new PermissionUpdateCommand(realFileId, realPermissionId, role, type, evaluatedEmailAddress, evaluatedDomain);
 
-            result = update.execute();
+        Permission updated = driveApi.execute(command);
 
-        } catch (IOException e) {
-            throw new PlatformException(e);
-        }
+        String permissionId = updated.getId();
 
-        String permissionId = result.getId();
+        PermissionUpdateAttribute attribute = new PermissionUpdateAttribute(permissionId, realFileId);
+
         return MessageBuilder.get(PermissionCreate.class)
                 .withString(permissionId, MimeType.TEXT_PLAIN)
+                .attributes(attribute)
                 .build();
     }
 }

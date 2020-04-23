@@ -1,7 +1,10 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.Drive;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionListAttribute;
+import com.reedelk.google.drive.v3.internal.command.PermissionListCommand;
 import com.reedelk.google.drive.v3.internal.commons.Mappers;
 import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
 import com.reedelk.runtime.api.annotation.Description;
@@ -18,6 +21,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -40,16 +44,16 @@ public class PermissionList implements ProcessorSync {
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;
 
-    private Drive drive;
-
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
+    private DriveApi driveApi;
+
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(PermissionDelete.class, configuration);
+        driveApi = DriveApiFactory.create(PermissionList.class, configuration);
     }
 
     @SuppressWarnings("rawtypes")
@@ -59,23 +63,15 @@ public class PermissionList implements ProcessorSync {
         String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
                 .orElseThrow(() -> new PermissionListException("File ID must not be null."));
 
-        com.google.api.services.drive.model.PermissionList list;
-        try {
-            list = drive.permissions().list(realFileId)
-                    .setFields("*")
-                    .execute();
-        } catch (IOException e) {
-            throw new PermissionListException(e.getMessage(), e);
-        }
+        PermissionListCommand command = new PermissionListCommand(realFileId);
 
-        // TODO: Attributes maybe should add the file and permission id in the attributes?
-        List<Map> permissions = list.getPermissions()
-                .stream()
-                .map(Mappers.PERMISSION)
-                .collect(toList());
+        List<Map> permissions = driveApi.execute(command);
+
+        PermissionListAttribute attribute = new PermissionListAttribute(realFileId);
 
         return MessageBuilder.get(FileDelete.class)
                 .withList(permissions, Map.class)
+                .attributes(attribute)
                 .build();
     }
 

@@ -1,8 +1,10 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionCreateAttribute;
+import com.reedelk.google.drive.v3.internal.command.PermissionCreateCommand;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -16,11 +18,10 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.IOException;
 import java.util.Optional;
 
+import static com.reedelk.google.drive.v3.internal.commons.Default.SEND_NOTIFICATION_EMAIL;
 import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.checkPreconditions;
-import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.createPermission;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -70,28 +71,27 @@ public class PermissionCreate implements ProcessorSync {
     private DynamicString domain;
 
     @Property("Send Notification Email")
+    @InitValue("true")
     private Boolean sendNotificationEmail;
-
-    private Drive drive;
 
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
+    private DriveApi driveApi;
+
     private Boolean realSendNotificationEmail;
 
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(PermissionCreate.class, configuration);
+        driveApi = DriveApiFactory.create(PermissionCreate.class, configuration);
         checkPreconditions(role, type, emailAddress, domain);
-        this.realSendNotificationEmail = Optional.ofNullable(sendNotificationEmail).orElse(true);// TODO:Default value
+        this.realSendNotificationEmail = Optional.ofNullable(sendNotificationEmail).orElse(SEND_NOTIFICATION_EMAIL);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-        Permission userPermission =
-                createPermission(scriptEngine, emailAddress, domain, role, type, flowContext, message);
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
@@ -103,26 +103,22 @@ public class PermissionCreate implements ProcessorSync {
                     .orElseThrow(() -> new PlatformException("File ID must not be null."));
         }
 
-        try {
-            Drive.Permissions.Create create = drive.permissions()
-                    .create(realFileId, userPermission)
-                    .setSendNotificationEmail(realSendNotificationEmail);
+        String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message).orElse(null);
+        String evaluatedDomain = scriptEngine.evaluate(domain, flowContext, message).orElse(null);
 
-            if (PermissionRole.OWNER.equals(role)) {
-                // This flag is mandatory when assigning an 'Owner' permission role.
-                create.setTransferOwnership(true);
-            }
+        PermissionCreateCommand command =
+                new PermissionCreateCommand(realFileId, role, type, evaluatedEmailAddress, evaluatedDomain, realSendNotificationEmail);
 
-            Permission result = create.execute();
+        Permission created = driveApi.execute(command);
 
-            String permissionId = result.getId();
-            return MessageBuilder.get(PermissionCreate.class)
-                    .withString(permissionId, MimeType.TEXT_PLAIN)
-                    .build();
+        String permissionId = created.getId();
 
-        } catch (IOException e) {
-            throw new PlatformException(e);
-        }
+        PermissionCreateAttribute attribute = new PermissionCreateAttribute(created.getId(), realFileId);
+
+        return MessageBuilder.get(PermissionCreate.class)
+                .withString(permissionId, MimeType.TEXT_PLAIN)
+                .attributes(attribute)
+                .build();
     }
 
     public void setConfiguration(DriveConfiguration configuration) {

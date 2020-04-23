@@ -1,4 +1,4 @@
-package com.reedelk.google.drive.v3.internal;
+package com.reedelk.google.drive.v3.internal.attribute;
 
 import com.google.api.services.drive.model.File;
 

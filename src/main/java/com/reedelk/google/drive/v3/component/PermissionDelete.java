@@ -1,7 +1,9 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.services.drive.Drive;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionDeleteAttribute;
+import com.reedelk.google.drive.v3.internal.command.PermissionDeleteCommand;
 import com.reedelk.google.drive.v3.internal.exception.PermissionDeleteException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
@@ -16,8 +18,6 @@ import com.reedelk.runtime.api.script.ScriptEngineService;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.IOException;
 
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
@@ -34,8 +34,7 @@ public class PermissionDelete implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
-    @Description("The ID of the file we want to change the permission. " +
-            "If empty, the file ID is taken from the message payload.")
+    @Description("The ID of the file we want to change the permission.")
     private DynamicString fileId;
 
     @Property("Permission ID")
@@ -43,16 +42,16 @@ public class PermissionDelete implements ProcessorSync {
             "If empty, the permission ID is taken from the message payload.")
     private DynamicString permissionId;
 
-    private Drive drive;
-
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
+    private DriveApi driveApi;
+
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(PermissionDelete.class, configuration);
+        driveApi = DriveApiFactory.create(PermissionDelete.class, configuration);
     }
 
     @Override
@@ -71,18 +70,27 @@ public class PermissionDelete implements ProcessorSync {
                     .orElseThrow(() -> new PermissionDeleteException("Permission ID must not be null."));
         }
 
-        try {
-            drive.permissions()
-                    .delete(realFileId, realPermissionId)
-                    .execute();
-        } catch (IOException e) {
-            throw new PermissionDeleteException(e.getMessage(), e);
-        }
+        PermissionDeleteCommand command = new PermissionDeleteCommand(realPermissionId, realFileId);
 
-        // TODO: Attributes maybe should add the file and permission id in the attributes?
-        // We return the removed permission ID.
+        driveApi.execute(command);
+
+        PermissionDeleteAttribute attribute = new PermissionDeleteAttribute(realPermissionId, realFileId);
+
         return MessageBuilder.get(FileDelete.class)
                 .withString(realPermissionId, MimeType.TEXT_PLAIN)
+                .attributes(attribute)
                 .build();
+    }
+
+    public void setConfiguration(DriveConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    public void setPermissionId(DynamicString permissionId) {
+        this.permissionId = permissionId;
+    }
+
+    public void setFileId(DynamicString fileId) {
+        this.fileId = fileId;
     }
 }

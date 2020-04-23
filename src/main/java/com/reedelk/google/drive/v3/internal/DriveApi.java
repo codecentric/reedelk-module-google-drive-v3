@@ -1,31 +1,23 @@
 package com.reedelk.google.drive.v3.internal;
 
-import com.google.api.services.drive.model.File;
-import com.reedelk.runtime.api.message.content.MimeType;
+import com.google.api.services.drive.Drive;
+import com.reedelk.google.drive.v3.internal.command.Command;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
 
-public interface DriveApi {
+public class DriveApi {
 
-    File fileCreate(String fileName,
-                    String fileDescription,
-                    MimeType fileMimeType,
-                    boolean indexableText,
-                    byte[] fileContent);
+    private final Drive drive;
 
-    List<Map<String, Serializable>> fileList(String driveId,
-                                             String orderBy,
-                                             String query,
-                                             String nextPageToken,
-                                             int pageSize);
+    public DriveApi(Drive drive) {
+        this.drive = drive;
+    }
 
-    void fileDelete(String fileId);
-
-    byte[] fileRead(String fileId);
-
-    void fileUpdate(String realFileId,
-                    MimeType fileMimeType,
-                    byte[] fileContent);
+    public <T> T execute(Command<T> command) {
+        try {
+            return command.execute(drive);
+        } catch (IOException e) {
+            throw command.onException(e);
+        }
+    }
 }

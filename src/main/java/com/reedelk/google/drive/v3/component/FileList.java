@@ -2,6 +2,8 @@ package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.attribute.FileListAttributes;
+import com.reedelk.google.drive.v3.internal.command.FileListCommand;
 import com.reedelk.google.drive.v3.internal.commons.Default;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
@@ -120,11 +122,16 @@ public class FileList implements ProcessorSync {
         String realNextPageToken =
                 scriptEngine.evaluate(nextPageToken, flowContext, message).orElse(null);
 
-        List<Map<String, Serializable>> driveFiles =
-                driveApi.fileList(driveId, orderBy, query, realNextPageToken, realPageSize);
+        FileListCommand command =
+                new FileListCommand(driveId, orderBy, query, realNextPageToken, realPageSize);
+
+        List<Map> driveFiles = driveApi.execute(command);
+
+        FileListAttributes attributes = new FileListAttributes();
 
         return MessageBuilder.get(FileList.class)
-                .withJavaObject(driveFiles)
+                .withList(driveFiles, Map.class)
+                .attributes(attributes)
                 .build();
     }
 

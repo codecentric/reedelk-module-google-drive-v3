@@ -19,7 +19,6 @@ import com.reedelk.runtime.api.resource.ResourceText;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringBufferInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
@@ -45,7 +44,7 @@ public class DriveApiFactory {
                     .setApplicationName(implementor.getSimpleName())
                     .build();
 
-            return new DriveApiImpl(service);
+            return new DriveApi(service);
         } catch (IOException | GeneralSecurityException e) {
             throw new PlatformException(e);
         }

@@ -4,4 +4,5 @@ public class Default {
 
     public static final int PAGE_SIZE = 100;
     public static final boolean CONTENT_AS_INDEXABLE_TEXT = false;
+    public static final boolean SEND_NOTIFICATION_EMAIL = false;
 }

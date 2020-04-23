@@ -2,10 +2,10 @@ package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.FileReadAttributes;
+import com.reedelk.google.drive.v3.internal.attribute.FileReadAttributes;
+import com.reedelk.google.drive.v3.internal.command.FileReadCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileReadException;
 import com.reedelk.runtime.api.annotation.*;
-import com.reedelk.runtime.api.commons.MimeTypeUtils;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -78,13 +78,15 @@ public class FileRead implements ProcessorSync {
                     .orElseThrow(() -> new FileReadException("File ID must not be null."));
         }
 
-        byte[] bytes = driveApi.fileRead(realFileId);
+        FileReadCommand command = new FileReadCommand(realFileId);
+
+        byte[] content = driveApi.execute(command);
 
         FileReadAttributes attributes = new FileReadAttributes(realFileId);
 
         return MessageBuilder.get(FileRead.class)
                 .attributes(attributes)
-                .withBinary(bytes, finalMimeType)
+                .withBinary(content, finalMimeType)
                 .build();
     }
 

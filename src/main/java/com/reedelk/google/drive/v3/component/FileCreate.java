@@ -3,7 +3,8 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.FileCreateAttributes;
+import com.reedelk.google.drive.v3.internal.attribute.FileCreateAttributes;
+import com.reedelk.google.drive.v3.internal.command.FileCreateCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.commons.MimeTypeUtils;
@@ -61,7 +62,7 @@ public class FileCreate implements ProcessorSync {
     @Property("Mime type")
     @MimeTypeCombo
     @Example(MimeType.AsString.IMAGE_JPEG)
-    @DefaultValue(MimeType.AsString.ANY)
+    @DefaultValue(MimeType.AsString.APPLICATION_BINARY)
     @When(propertyName = "autoMimeType", propertyValue = "false")
     @When(propertyName = "autoMimeType", propertyValue = When.BLANK)
     @Description("The mime type of the file to be created on Google Drive.")
@@ -105,14 +106,13 @@ public class FileCreate implements ProcessorSync {
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-        File file = driveApi.fileCreate(
-                finalFileName,
-                finalFileDescription,
-                finalMimeType,
-                realIndexableText,
-                fileContent);
+        FileCreateCommand command =
+                new FileCreateCommand(finalFileName, finalFileDescription, finalMimeType, realIndexableText, fileContent);
+
+        File file = driveApi.execute(command);
 
         FileCreateAttributes attributes = new FileCreateAttributes(file);
+
         return MessageBuilder.get(FileCreate.class)
                 .withString(file.getId(), MimeType.TEXT_PLAIN)
                 .attributes(attributes)
@@ -127,6 +127,10 @@ public class FileCreate implements ProcessorSync {
         this.configuration = configuration;
     }
 
+    public void setIndexableText(Boolean indexableText) {
+        this.indexableText = indexableText;
+    }
+
     public void setAutoMimeType(boolean autoMimeType) {
         this.autoMimeType = autoMimeType;
     }
@@ -137,9 +141,5 @@ public class FileCreate implements ProcessorSync {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
-    }
-
-    public void setIndexableText(Boolean indexableText) {
-        this.indexableText = indexableText;
     }
 }
