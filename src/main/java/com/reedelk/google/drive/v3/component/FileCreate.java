@@ -98,8 +98,8 @@ public class FileCreate implements ProcessorSync {
 
         String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message).orElse(null);
 
-        // TODO: Test what happens when the file extension is not given.
-        MimeType finalMimeType = MimeTypeUtils.mimeTypeFrom(autoMimeType, this.mimeType, finalFileName, MimeType.ANY);
+        MimeType finalMimeType =
+                MimeTypeUtils.fromFileExtensionOrParse(autoMimeType, mimeType, finalFileName, MimeType.APPLICATION_BINARY);
 
         Object payload = message.payload();
 

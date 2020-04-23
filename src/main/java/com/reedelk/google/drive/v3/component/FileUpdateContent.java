@@ -1,10 +1,9 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.client.http.ByteArrayContent;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
+import com.reedelk.google.drive.v3.internal.FileUpdateContentAttributes;
+import com.reedelk.google.drive.v3.internal.exception.FileUpdateContentException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -16,8 +15,6 @@ import com.reedelk.runtime.api.script.ScriptEngineService;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.IOException;
 
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -48,11 +45,12 @@ public class FileUpdateContent implements ProcessorSync {
     private ConverterService converterService;
 
     private MimeType fileMimeType;
-    private Drive drive;
+
+    private DriveApi driveApi;
 
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(FileList.class, configuration);
+        driveApi = DriveApiFactory.create(FileUpdateContent.class, configuration);
         fileMimeType = MimeType.parse(mimeType, MimeType.TEXT_PLAIN);
     }
 
@@ -60,27 +58,19 @@ public class FileUpdateContent implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                .orElseThrow(() -> new FileUpdateException("File ID must not be null."));
+                .orElseThrow(() -> new FileUpdateContentException("File ID must not be null."));
 
         Object payload = message.payload();
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-        ByteArrayContent byteArrayContent =
-                new ByteArrayContent(fileMimeType.toString(), fileContent);
+        driveApi.fileUpdate(realFileId, fileMimeType, fileContent);
 
-        File updatedFile;
-        try {
-            updatedFile = drive.files().update(realFileId, null, byteArrayContent)
-                    .setFields("*")
-                    .execute();
-        } catch (IOException exception) {
-            String error = "";
-            throw new FileUpdateException(error, exception);
-        }
+        FileUpdateContentAttributes attributes = new FileUpdateContentAttributes(realFileId);
 
         return MessageBuilder.get(FileUpdateContent.class)
-                .withString(updatedFile.getId(), MimeType.TEXT_PLAIN)
+                .withString(realFileId, MimeType.TEXT_PLAIN)
+                .attributes(attributes)
                 .build();
     }
 }

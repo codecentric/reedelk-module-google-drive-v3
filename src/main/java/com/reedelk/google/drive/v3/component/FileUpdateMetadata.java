@@ -3,7 +3,7 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
+import com.reedelk.google.drive.v3.internal.exception.FileUpdateContentException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
 import com.reedelk.runtime.api.annotation.Property;
@@ -58,7 +58,7 @@ public class FileUpdateMetadata implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                .orElseThrow(() -> new FileUpdateException("File ID must not be null."));
+                .orElseThrow(() -> new FileUpdateContentException("File ID must not be null."));
 
         File fileMetadata = new File();
         scriptEngine.evaluate(fileName, flowContext, message).ifPresent(fileMetadata::setName);
@@ -72,7 +72,7 @@ public class FileUpdateMetadata implements ProcessorSync {
 
         } catch (IOException exception) {
             String error = ""; // TODO: Here
-            throw new FileUpdateException(error, exception);
+            throw new FileUpdateContentException(error, exception);
         }
 
         return MessageBuilder.get(FileUpdateContent.class)

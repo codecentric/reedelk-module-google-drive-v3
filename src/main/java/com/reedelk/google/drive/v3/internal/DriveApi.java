@@ -21,5 +21,11 @@ public interface DriveApi {
                                              String nextPageToken,
                                              int pageSize);
 
-    void fileDelete(String realFileId);
+    void fileDelete(String fileId);
+
+    byte[] fileRead(String fileId);
+
+    void fileUpdate(String realFileId,
+                    MimeType fileMimeType,
+                    byte[] fileContent);
 }

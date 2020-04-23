@@ -5,7 +5,9 @@ import java.util.HashMap;
 
 public class FileDeleteAttributes extends HashMap<String, Serializable> {
 
+    private static final String ATTR_ID = "fileId";
+
     public FileDeleteAttributes(String fileId) {
-        put("fileId", fileId);
+        put(ATTR_ID, fileId);
     }
 }

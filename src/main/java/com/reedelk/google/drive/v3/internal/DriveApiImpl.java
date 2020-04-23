@@ -5,11 +5,10 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.reedelk.google.drive.v3.internal.commons.Mappers;
-import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
-import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
-import com.reedelk.google.drive.v3.internal.exception.FileListException;
+import com.reedelk.google.drive.v3.internal.exception.*;
 import com.reedelk.runtime.api.message.content.MimeType;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -78,13 +77,40 @@ public class DriveApiImpl implements DriveApi {
     }
 
     @Override
-    public void fileDelete(String realFileId) {
+    public void fileDelete(String fileId) {
         try {
-            drive.files().delete(realFileId).execute();
+            drive.files().delete(fileId).execute();
         } catch (IOException exception) {
             // TODO: Should not use generic errors ?
-            String error = GENERIC_ERROR.format(realFileId, exception.getMessage());
+            String error = GENERIC_ERROR.format(fileId, exception.getMessage());
             throw new FileDeleteException(error, exception);
+        }
+    }
+
+    @Override
+    public byte[] fileRead(String fileId) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
+            drive.files()
+                    .get(fileId)
+                    .executeMediaAndDownloadTo(outputStream);
+
+            return outputStream.toByteArray();
+
+        } catch (IOException exception) {
+            String error = ""; // TODO: Fixme.
+            throw new FileReadException(error, exception);
+        }
+    }
+
+    @Override
+    public void fileUpdate(String realFileId, MimeType fileMimeType, byte[] fileContent) {
+        ByteArrayContent byteArrayContent = new ByteArrayContent(fileMimeType.toString(), fileContent);
+        try {
+            drive.files().update(realFileId, null, byteArrayContent)
+                    .execute();
+        } catch (IOException exception) {
+            String error = "";
+            throw new FileUpdateContentException(error, exception);
         }
     }
 }

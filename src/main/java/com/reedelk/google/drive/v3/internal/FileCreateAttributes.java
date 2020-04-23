@@ -11,8 +11,8 @@ public class FileCreateAttributes extends HashMap<String, Serializable> {
 
     private static final String ATTR_WEB_CONTENT_LINK = "webContentLink";
     private static final String ATTR_WEB_VIEW_LINK = "webViewLink";
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_ID = "id";
+    private static final String ATTR_NAME = "fileName";
+    private static final String ATTR_ID = "fileId";
 
     public static final List<String> ALL_ATTRIBUTES =
             Arrays.asList(ATTR_WEB_CONTENT_LINK, ATTR_WEB_VIEW_LINK, ATTR_NAME, ATTR_ID);
