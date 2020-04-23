@@ -3,6 +3,10 @@ package com.reedelk.google.drive.v3.internal;
 import com.google.api.services.drive.model.File;
 import com.reedelk.runtime.api.message.content.MimeType;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 public interface DriveApi {
 
     File fileCreate(String fileName,
@@ -10,4 +14,12 @@ public interface DriveApi {
                     MimeType fileMimeType,
                     boolean indexableText,
                     byte[] fileContent);
+
+    List<Map<String, Serializable>> fileList(String driveId,
+                                             String orderBy,
+                                             String query,
+                                             String nextPageToken,
+                                             int pageSize);
+
+    void fileDelete(String realFileId);
 }

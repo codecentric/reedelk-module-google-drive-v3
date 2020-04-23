@@ -1,7 +1,8 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.services.drive.Drive;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.FileDeleteAttributes;
 import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.runtime.api.annotation.Description;
 import com.reedelk.runtime.api.annotation.ModuleComponent;
@@ -17,13 +18,19 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.IOException;
-
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive File Delete")
 @Component(service = FileDelete.class, scope = PROTOTYPE)
+@Description("Deletes a file from Google Drive with the given file ID. " +
+        "This component requires the configuration of a Service Account to make authorized API calls " +
+        "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
+        "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
+        "More info about Service Accounts and how they can be created and configured can " +
+        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page. " +
+        "The ID of the file is taken from the input message payload if not defined in the 'File ID' property. " +
+        "A dynamic expression can be used to dynamically define the file ID.")
 public class FileDelete implements ProcessorSync {
 
     @Property("Configuration")
@@ -34,8 +41,7 @@ public class FileDelete implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
-    @Description("The ID of the file we want to delete. " +
-            "If empty, the file ID is taken from the message payload.")
+    @Description("The ID of the file to delete. If not defined, the file ID is taken from the message payload.")
     private DynamicString fileId;
 
     @Reference
@@ -43,11 +49,11 @@ public class FileDelete implements ProcessorSync {
     @Reference
     private ConverterService converterService;
 
-    private Drive drive;
+    private DriveApi driveApi;
 
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(FileDelete.class, configuration);
+        driveApi = DriveApiFactory.create(FileDelete.class, configuration);
     }
 
     @Override
@@ -62,14 +68,12 @@ public class FileDelete implements ProcessorSync {
                     .orElseThrow(() -> new FileDeleteException("File ID must not be null."));
         }
 
-        try {
-            drive.files().delete(realFileId).execute();
-        } catch (IOException e) {
-            throw new FileDeleteException(e.getMessage(), e);
-        }
+        driveApi.fileDelete(realFileId);
 
+        FileDeleteAttributes attributes = new FileDeleteAttributes(realFileId);
         return MessageBuilder.get(FileDelete.class)
                 .withString(realFileId, MimeType.TEXT_PLAIN)
+                .attributes(attributes)
                 .build();
     }
 

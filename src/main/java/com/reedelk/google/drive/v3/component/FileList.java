@@ -1,10 +1,8 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.google.api.services.drive.Drive;
+import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.commons.Default;
-import com.reedelk.google.drive.v3.internal.commons.Mappers;
-import com.reedelk.google.drive.v3.internal.exception.FileListException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -15,14 +13,11 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.reedelk.runtime.api.commons.StringUtils.isNotBlank;
-import static java.util.stream.Collectors.toList;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Files List")
@@ -102,69 +97,54 @@ public class FileList implements ProcessorSync {
             "Each key sorts ascending by default, but may be reversed with the 'desc' modifier.")
     private String orderBy;
 
-    private Drive drive;
-    private int realPageSize;
-
     @Reference
     private ScriptEngineService scriptEngine;
 
+    private DriveApi driveApi;
+
+    private int realPageSize;
+
     @Override
     public void initialize() {
-        drive = DriveApiFactory.create(FileList.class, configuration);
+        driveApi = DriveApiFactory.create(FileList.class, configuration);
         realPageSize = Optional.ofNullable(pageSize).orElse(Default.PAGE_SIZE);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-        try {
 
-            Drive.Files.List list = drive.files().list();
-            list.setPageSize(realPageSize);
-            scriptEngine.evaluate(nextPageToken, flowContext, message)
-                    .ifPresent(list::setPageToken);
-            if (isNotBlank(driveId)) list.setDriveId(driveId);
-            if (isNotBlank(orderBy)) list.setOrderBy(orderBy);
-            if (isNotBlank(query)) list.setQ(query);
+        String realNextPageToken =
+                scriptEngine.evaluate(nextPageToken, flowContext, message).orElse(null);
 
-            com.google.api.services.drive.model.FileList files =
-                    list.setFields("*")
-                    .execute();
-            List<Map<String, Serializable>> mappedFiles = files.getFiles()
-                    .stream()
-                    .map(Mappers.FILE)
-                    .collect(toList());
+        List<Map<String, Serializable>> driveFiles =
+                driveApi.fileList(driveId, orderBy, query, realNextPageToken, realPageSize);
 
-            return MessageBuilder.get(FileList.class)
-                    .withJavaObject(mappedFiles)
-                    .build();
-
-        } catch (IOException exception) {
-            String error = ""; // TODO: Test
-            throw new FileListException(error, exception);
-        }
+        return MessageBuilder.get(FileList.class)
+                .withJavaObject(driveFiles)
+                .build();
     }
 
     public void setConfiguration(DriveConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    public void setDriveId(String driveId) {
-        this.driveId = driveId;
+    public void setNextPageToken(DynamicString nextPageToken) {
+        this.nextPageToken = nextPageToken;
     }
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
 
-    public void setNextPageToken(DynamicString nextPageToken) {
-        this.nextPageToken = nextPageToken;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
+    public void setDriveId(String driveId) {
+        this.driveId = driveId;
     }
 
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 }
