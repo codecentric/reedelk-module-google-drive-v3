@@ -70,7 +70,7 @@ public class FileCreate implements ProcessorSync {
 
     @Property("Use content as indexable text")
     @DefaultValue("false")
-    @Group("Indexing")
+    @Group("Advanced")
     @Example("true")
     @Description("Whether to use the uploaded content as indexable text.")
     private Boolean indexableText;

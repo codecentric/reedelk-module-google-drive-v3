@@ -71,6 +71,7 @@ public class PermissionCreate implements ProcessorSync {
     private DynamicString domain;
 
     @Property("Send Notification Email")
+    @Group("Advanced")
     @InitValue("true")
     private Boolean sendNotificationEmail;
 

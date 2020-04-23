@@ -24,6 +24,7 @@
       "description": "Google File Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
       "fileName": "#[message.attributes().pathParams.fileName]",
+      "fileDescription": "",
       "autoMimeType": true
     },
     {
@@ -34,6 +35,13 @@
       "role": "WRITER",
       "type": "USER",
       "emailAddress": "gironi.lorenzo@gmail.com"
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.PermissionCreate",
+      "description": "Drive Permission Create",
+      "role": "READER",
+      "type": "USER",
+      "sendNotificationEmail": true
     }
   ]
 }
