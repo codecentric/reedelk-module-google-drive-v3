@@ -21,11 +21,15 @@ import java.util.Optional;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Files List")
-@Description("The Google File List component lists or searches files from google drive. " +
-        "Optional search filters and order by sort keys can be applied to filter and order the returned results. " +
-        "If the number of returned files is potentially large it is recommended to use pagination by setting the page size and " +
-        "page token for subsequent listings.")
 @Component(service = FileList.class, scope = PROTOTYPE)
+@Description("Lists files from Google Drive. " +
+        "Optional search filters and order by sort keys can be applied to filter and order the returned results. " +
+        "If the number of returned files is potentially large it is recommended to use pagination by setting the page size and page token for subsequent listings." +
+        "This component requires the configuration of a Service Account to make authorized API calls " +
+        "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
+        "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
+        "More info about Service Accounts and how they can be created and configured can " +
+        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
 public class FileList implements ProcessorSync {
 
     @Property("Configuration")

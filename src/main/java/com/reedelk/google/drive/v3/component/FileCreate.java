@@ -26,15 +26,15 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 @ModuleComponent("Drive File Create")
 @Component(service = FileCreate.class, scope = PROTOTYPE)
 @Description("Creates a new file in Google Drive with the given name and optional description. " +
+        "The content of the file is taken from the input message payload and if the file was successfully created " +
+        "the ID of the file is returned in the output message payload. The default file owner will be the provided Service Account and permissions " +
+        "on the file must be used in order to assign further read/write permissions to other users. New permissions can be " +
+        "created using the 'Drive Permission Create' component. " +
         "This component requires the configuration of a Service Account to make authorized API calls " +
         "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
         "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
         "More info about Service Accounts and how they can be created and configured can " +
-        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page. " +
-        "The content of the file is taken from the input message payload and if the file was successfully created " +
-        "the ID of the file is returned. The default file owner will be the provided Service Account and permissions " +
-        "on the file must be used to assign read/write permissions to other users. New permissions can be " +
-        "created using 'Google Permission Create' component.")
+        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
 public class FileCreate implements ProcessorSync {
 
     @Property("Configuration")
