@@ -25,6 +25,14 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Permission Update")
 @Component(service = PermissionUpdate.class, scope = PROTOTYPE)
+@Description("Updates a permissions for a given file in Google Drive. " +
+        "If not defined in the 'Permission ID' property, the ID of the permission we want to update is taken from the input message payload. " +
+        "This component requires to specify a not empty 'File ID' property which identifies the file we want to update the permission to. " +
+        "This component requires the configuration of a Service Account to make authorized API calls " +
+        "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
+        "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
+        "More info about Service Accounts and how they can be created and configured can " +
+        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
 public class PermissionUpdate implements ProcessorSync {
 
     @Property("Configuration")

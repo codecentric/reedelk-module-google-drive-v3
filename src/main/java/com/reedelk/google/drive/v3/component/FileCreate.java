@@ -46,17 +46,24 @@ public class FileCreate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File name")
-    @Description("")
+    @Hint("my_picture.jpg")
+    @Example("my_picture.jpg")
+    @Description("The name of the file. This is not necessarily unique within a folder. " +
+            "Note that for immutable items such as the top level folders of shared drives, " +
+            "My Drive root folder, and Application Data folder the name is constant.")
     private DynamicString fileName;
 
     @Property("File description")
+    @Hint("My picture from summer 2019")
+    @Example("My picture from summer 2019")
+    @Description("A short description of the file.")
     private DynamicString fileDescription;
 
     @Property("Auto mime type")
     @Example("true")
     @InitValue("true")
     @DefaultValue("false")
-    @Description("If true, the mime type of the payload is determined from the extension of the resource read.")
+    @Description("If true, the mime type of the payload is determined from the file extension of the file name.")
     private boolean autoMimeType;
 
     @Property("Mime type")

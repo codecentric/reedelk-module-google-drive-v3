@@ -27,6 +27,14 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Permission Create")
 @Component(service = PermissionCreate.class, scope = PROTOTYPE)
+@Description("Creates a new permission for a file in Google Drive. " +
+        "If not defined in the 'File ID' property, the ID of the file we want to assign the permission to is taken from the input message payload. " +
+        "A permission grants a user, group, domain or the world access to a file or a folder hierarchy." +
+        "This component requires the configuration of a Service Account to make authorized API calls " +
+        "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
+        "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
+        "More info about Service Accounts and how they can be created and configured can " +
+        "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
 public class PermissionCreate implements ProcessorSync {
 
     @Property("Configuration")
@@ -40,13 +48,6 @@ public class PermissionCreate implements ProcessorSync {
     @Description("The ID of the file or shared drive we want to create this permission for. " +
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;
-
-    @Property("Role")
-    @Example("OWNER")
-    @InitValue("READER")
-    @DefaultValue("READER")
-    @Description("The role granted by this permission.")
-    private PermissionRole role = PermissionRole.READER;
 
     @Property("Type")
     @InitValue("USER")
@@ -69,6 +70,13 @@ public class PermissionCreate implements ProcessorSync {
     @Description("The domain to which this permission refers.")
     @When(propertyName = "type", propertyValue = "DOMAIN")
     private DynamicString domain;
+
+    @Property("Role")
+    @Example("OWNER")
+    @InitValue("READER")
+    @DefaultValue("READER")
+    @Description("The role granted by this permission.")
+    private PermissionRole role = PermissionRole.READER;
 
     @Property("Send Notification Email")
     @Group("Advanced")
