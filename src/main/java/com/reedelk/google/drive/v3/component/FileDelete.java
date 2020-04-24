@@ -5,7 +5,6 @@ import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.FileDeleteAttributes;
 import com.reedelk.google.drive.v3.internal.command.FileDeleteCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
-import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -18,6 +17,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDelete.FILE_ID_NULL;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.*;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -63,11 +63,16 @@ public class FileDelete implements ProcessorSync {
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
-            // We take it from the message payload.
-            // The payload might not be a string, therefore we must convert it.
-            // TODO: Input not supported check?
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the File ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
+
             Object payload = message.payload();
+
+            Input.requireTypeMatchesAny(FileDelete.class, payload, String.class, byte[].class);
+
             realFileId = converterService.convert(payload, String.class);
+
         } else {
             realFileId = scriptEngine.evaluate(fileId, flowContext, message)
                     .orElseThrow(() -> new FileDeleteException(FILE_ID_NULL.format(fileId.value())));
