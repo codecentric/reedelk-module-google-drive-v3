@@ -46,11 +46,11 @@ public class FileDelete implements ProcessorSync {
     private DynamicString fileId;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     @Override
     public void initialize() {
