@@ -54,14 +54,7 @@ public class PermissionUpdate implements ProcessorSync {
     @Description("The ID of the permission we want to update. If empty, the permission ID is taken from the message payload.")
     private DynamicString permissionId;
 
-    @Property("Role")
-    @Example("OWNER")
-    @InitValue("READER")
-    @DefaultValue("READER")
-    @Description("The role granted by this permission.")
-    private PermissionRole role = PermissionRole.READER;
-
-    @Property("Type")
+    @Property("Permission Type")
     @InitValue("USER")
     @Example("GROUP")
     @DefaultValue("USER")
@@ -70,6 +63,13 @@ public class PermissionUpdate implements ProcessorSync {
             "When type is domain, you must provide a domain. " +
             "There isn't extra information required for a anyone type.")
     private PermissionType type = PermissionType.USER;
+
+    @Property("Permission Role")
+    @Example("OWNER")
+    @InitValue("READER")
+    @DefaultValue("READER")
+    @Description("The role granted by this permission.")
+    private PermissionRole role = PermissionRole.READER;
 
     @Property("Email")
     @Hint("my-user@mydomain.com")
