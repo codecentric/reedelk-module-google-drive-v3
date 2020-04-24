@@ -40,6 +40,8 @@ public class FileUpdate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
+    @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
+    @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file we want to update. The file ID is mandatory.")
     private DynamicString fileId;
 

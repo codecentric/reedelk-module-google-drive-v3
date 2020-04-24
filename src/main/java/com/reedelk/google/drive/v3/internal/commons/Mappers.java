@@ -30,11 +30,15 @@ public class Mappers {
         map.put("name", file.getName());
         map.put("originalFilename", file.getOriginalFilename());
         map.put("ownedByMe", file.getOwnedByMe());
-
-        List<Map<String, Serializable>> collect = file.getOwners().stream().map(USER).collect(toList());
-        map.put("owners", new ArrayList<>(collect));
         map.put("webViewLink", file.getWebViewLink());
         map.put("webContentLink", file.getWebContentLink());
+
+        if (file.getOwners() != null) {
+            List<Map<String, Serializable>> collect =
+                    file.getOwners().stream().map(USER).collect(toList());
+            map.put("owners", new ArrayList<>(collect));
+        }
+
         return map;
     };
 

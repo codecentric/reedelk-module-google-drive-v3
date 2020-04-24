@@ -40,6 +40,8 @@ public class FileRead implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
+    @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
+    @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file to read the content from. " +
             "If not defined, the file ID is taken from the message payload.")
     private DynamicString fileId;

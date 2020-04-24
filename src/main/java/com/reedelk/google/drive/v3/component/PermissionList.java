@@ -5,9 +5,7 @@ import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionListAttribute;
 import com.reedelk.google.drive.v3.internal.command.PermissionListCommand;
 import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
-import com.reedelk.runtime.api.annotation.Description;
-import com.reedelk.runtime.api.annotation.ModuleComponent;
-import com.reedelk.runtime.api.annotation.Property;
+import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -43,6 +41,8 @@ public class PermissionList implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
+    @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
+    @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file we want to list the permission. " +
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;

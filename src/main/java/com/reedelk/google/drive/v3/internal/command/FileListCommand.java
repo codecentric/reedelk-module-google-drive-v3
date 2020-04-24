@@ -41,7 +41,7 @@ public class FileListCommand implements Command<List<Map>> {
         list.setOrderBy(orderBy);
         list.setQ(query);
 
-        FileList files = list.execute();
+        FileList files = list.setFields("*").execute();
 
         return files.getFiles()
                 .stream()

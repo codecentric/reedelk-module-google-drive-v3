@@ -43,6 +43,8 @@ public class PermissionUpdate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
+    @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
+    @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file we want to list the permission. " +
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;

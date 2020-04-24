@@ -45,6 +45,8 @@ public class PermissionCreate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("File ID")
+    @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
+    @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file or shared drive we want to create this permission for. " +
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;
@@ -60,6 +62,8 @@ public class PermissionCreate implements ProcessorSync {
     private PermissionType type = PermissionType.USER;
 
     @Property("Email")
+    @Hint("my-user@mydomain.com")
+    @Example("my-user@mydomain.com")
     @Description("The email address of the user or group to which this permission refers.")
     @When(propertyName = "type", propertyValue = "USER")
     @When(propertyName = "type", propertyValue = "GROUP")
@@ -67,6 +71,8 @@ public class PermissionCreate implements ProcessorSync {
     private DynamicString emailAddress;
 
     @Property("Domain")
+    @Hint("www.mydomain.com")
+    @Example("www.mydomain.com")
     @Description("The domain to which this permission refers.")
     @When(propertyName = "type", propertyValue = "DOMAIN")
     private DynamicString domain;

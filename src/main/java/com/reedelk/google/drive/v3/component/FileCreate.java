@@ -54,8 +54,8 @@ public class FileCreate implements ProcessorSync {
     private DynamicString fileName;
 
     @Property("File description")
-    @Hint("My picture from summer 2019")
-    @Example("My picture from summer 2019")
+    @Hint("My document")
+    @Example("My document")
     @Description("A short description of the file.")
     private DynamicString fileDescription;
 

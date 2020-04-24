@@ -24,6 +24,7 @@ public class PermissionListCommand implements Command<List<Map>> {
     public List<Map> execute(Drive drive) throws IOException {
 
         PermissionList list = drive.permissions().list(fileId)
+                .setFields("*")
                 .execute();
 
         return list.getPermissions()
