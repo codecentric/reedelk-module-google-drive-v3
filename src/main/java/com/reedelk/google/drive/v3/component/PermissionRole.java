@@ -7,10 +7,6 @@ public enum PermissionRole {
 
     @DisplayName("Owner")
     OWNER("owner"),
-    @DisplayName("Organizer")
-    ORGANIZER("organizer"),
-    @DisplayName("File Organizer")
-    FILE_ORGANIZER("fileOrganizer"),
     @DisplayName("Writer")
     WRITER("writer"),
     @DisplayName("Commenter")

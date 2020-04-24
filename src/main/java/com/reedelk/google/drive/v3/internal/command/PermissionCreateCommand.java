@@ -4,6 +4,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
+import com.reedelk.google.drive.v3.internal.exception.PermissionCreateException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
 
@@ -40,22 +41,23 @@ public class PermissionCreateCommand implements Command<Permission> {
         role.set(userPermission);
         type.set(userPermission);
 
+        Drive.Permissions.Create create = drive
+                .permissions()
+                .create(fileId, userPermission);
+
         if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
             // emailAddress is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
             checkState(StringUtils.isNotBlank(emailAddress),
                     "Email address is mandatory when permission type is user or group.");
             userPermission.setEmailAddress(emailAddress);
+            create.setSendNotificationEmail(sendNotificationEmail);
 
         } else if (PermissionType.DOMAIN.equals(type)) {
             // domain is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
-            checkState(StringUtils.isNotBlank(emailAddress),
+            checkState(StringUtils.isNotBlank(domain),
                     "Domain is mandatory when permission type is domain.");
             userPermission.setDomain(domain);
         }
-
-        Drive.Permissions.Create create = drive.permissions()
-                .create(fileId, userPermission)
-                .setSendNotificationEmail(sendNotificationEmail);
 
         if (PermissionRole.OWNER.equals(role)) {
             // This flag is mandatory when assigning an 'Owner' permission role.
@@ -67,6 +69,7 @@ public class PermissionCreateCommand implements Command<Permission> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        return null;
+        String error = "";
+        return new PermissionCreateException(error, exception);
     }
 }

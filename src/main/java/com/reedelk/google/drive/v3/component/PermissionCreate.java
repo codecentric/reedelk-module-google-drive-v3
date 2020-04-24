@@ -152,6 +152,10 @@ public class PermissionCreate implements ProcessorSync {
         this.domain = domain;
     }
 
+    public void setSendNotificationEmail(Boolean sendNotificationEmail) {
+        this.sendNotificationEmail = sendNotificationEmail;
+    }
+
     public void setRole(PermissionRole role) {
         this.role = role;
     }
