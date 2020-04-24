@@ -7,7 +7,7 @@
       "implementor": "com.reedelk.rest.component.RESTListener",
       "description": "REST Listener",
       "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
-      "path": "/list",
+      "path": "/file",
       "method": "GET",
       "streaming": "AUTO",
       "response": {

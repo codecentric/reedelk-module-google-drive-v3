@@ -1,0 +1,51 @@
+{
+  "id": "67df4c0a-d408-4f4e-b8ff-cd08b9e1cf8e",
+  "title": "File Delete All",
+  "description": "File Delete All Flow",
+  "flow": [
+    {
+      "implementor": "com.reedelk.rest.component.RESTListener",
+      "description": "REST Listener",
+      "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
+      "path": "/deleteall",
+      "method": "GET",
+      "streaming": "AUTO",
+      "response": {
+        "body": "#[message.payload()]",
+        "status": 200
+      },
+      "errorResponse": {
+        "body": "#[error]",
+        "status": 500
+      }
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.FileList",
+      "description": "Drive Files List",
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
+    },
+    {
+      "implementor": "com.reedelk.runtime.component.ForEach",
+      "collection": "#[message.payload()]",
+      "next": [
+        {
+          "implementor": "com.reedelk.core.component.PayloadSet",
+          "description": "Payload Set",
+          "mimeType": "text/plain",
+          "payload": "#[message.payload().id]"
+        },
+        {
+          "implementor": "com.reedelk.core.component.LoggerComponent",
+          "description": "Logger",
+          "level": "INFO",
+          "message": "#['Deleting file with id: ' + message.payload()]"
+        },
+        {
+          "implementor": "com.reedelk.google.drive.v3.component.FileDelete",
+          "description": "Drive File Delete",
+          "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
+        }
+      ]
+    }
+  ]
+}

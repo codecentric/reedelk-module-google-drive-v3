@@ -7,7 +7,7 @@
       "implementor": "com.reedelk.rest.component.RESTListener",
       "description": "GET Hello World REST Listener",
       "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
-      "path": "/create/{fileName}",
+      "path": "/file/{fileName}",
       "method": "POST",
       "streaming": "AUTO",
       "response": {
@@ -20,38 +20,22 @@
       }
     },
     {
-      "implementor": "com.reedelk.google.drive.v3.component.FileCreate",
+      "implementor": "com.reedelk.google.drive.v3.component.FileUpload",
       "description": "Google File Create",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
       "fileName": "#[message.attributes().pathParams.fileName]",
       "fileDescription": "",
-      "autoMimeType": true
-    },
-    {
-      "implementor": "com.reedelk.google.drive.v3.component.PermissionCreate",
-      "description": "Google Permission Create",
-      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
-      "fileId": "",
-      "type": "USER",
-      "emailAddress": "gironi.lorenzo@gmail.com",
-      "role": "WRITER"
+      "parentFolderId": ""
     },
     {
       "implementor": "com.reedelk.google.drive.v3.component.PermissionCreate",
       "description": "Drive Permission Create",
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
+      "fileId": "#[message.payload()]",
       "type": "USER",
       "role": "READER",
+      "emailAddress": "gironi.lorenzo@gmail.com",
       "sendNotificationEmail": true
-    },
-    {
-      "implementor": "com.reedelk.google.drive.v3.component.FileCreate",
-      "description": "Drive File Create",
-      "autoMimeType": true
-    },
-    {
-      "implementor": "com.reedelk.google.drive.v3.component.FileList",
-      "description": "Drive Files List",
-      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"}
     }
   ]
 }

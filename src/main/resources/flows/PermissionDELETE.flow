@@ -1,0 +1,30 @@
+{
+  "id": "8a17d4dc-08af-451a-b2ec-471113c70ba8",
+  "title": "Permission DELETE",
+  "description": "Permission DELETE Flow",
+  "flow": [
+    {
+      "implementor": "com.reedelk.rest.component.RESTListener",
+      "description": "REST Listener",
+      "configuration": {"ref": "f1dd4761-2578-4506-a51f-881e1e5a7945"},
+      "path": "/permission/{fileId}/{permissionId}",
+      "method": "DELETE",
+      "streaming": "AUTO",
+      "response": {
+        "body": "#[message.payload()]",
+        "status": 200
+      },
+      "errorResponse": {
+        "body": "#[error]",
+        "status": 500
+      }
+    },
+    {
+      "implementor": "com.reedelk.google.drive.v3.component.PermissionDelete",
+      "description": "Drive Permission Delete",
+      "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
+      "fileId": "#[message.attributes().pathParams.fileId]",
+      "permissionId": "#[message.attributes().pathParams.permissionId]"
+    }
+  ]
+}
