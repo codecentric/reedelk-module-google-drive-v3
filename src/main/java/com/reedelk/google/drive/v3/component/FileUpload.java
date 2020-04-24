@@ -5,7 +5,7 @@ import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.FileCreateAttributes;
 import com.reedelk.google.drive.v3.internal.command.FileUploadCommand;
-import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
+import com.reedelk.google.drive.v3.internal.exception.FileUploadException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -92,12 +92,12 @@ public class FileUpload implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String finalFileName = scriptEngine.evaluate(fileName, flowContext, message)
-                .orElseThrow(() -> new FileCreateException("File name must not be empty"));
+                .orElseThrow(() -> new FileUploadException("File name must not be empty"));
 
         String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message)
                 .orElse(null);
 
-        String finalFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
+        String finalParentFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
                 .orElse(null);
 
         Object payload = message.payload();
@@ -105,7 +105,7 @@ public class FileUpload implements ProcessorSync {
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
         FileUploadCommand command =
-                new FileUploadCommand(finalFileName, finalFileDescription, finalFolderId, realIndexableText, fileContent);
+                new FileUploadCommand(finalFileName, finalFileDescription, finalParentFolderId, realIndexableText, fileContent);
 
         File file = driveApi.execute(command);
 

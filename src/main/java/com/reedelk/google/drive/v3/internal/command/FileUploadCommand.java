@@ -3,7 +3,7 @@ package com.reedelk.google.drive.v3.internal.command;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
+import com.reedelk.google.drive.v3.internal.exception.FileUploadException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
 
@@ -14,20 +14,20 @@ public class FileUploadCommand implements Command<File> {
 
     private final String fileDescription;
     private final boolean indexableText;
+    private final String parentFolderId;
     private final byte[] fileContent;
     private final String fileName;
-    private final String folderId;
 
     public FileUploadCommand(String fileName,
                              String fileDescription,
-                             String folderId,
+                             String parentFolderId,
                              boolean indexableText,
                              byte[] fileContent) {
         this.fileDescription = fileDescription;
         this.indexableText = indexableText;
         this.fileContent = fileContent;
         this.fileName = fileName;
-        this.folderId = folderId;
+        this.parentFolderId = parentFolderId;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class FileUploadCommand implements Command<File> {
         fileMetadata.setDescription(fileDescription);
 
         // If given, we set the parent folder id where the file should belong to.
-        if (StringUtils.isNotBlank(folderId)) {
-            fileMetadata.setParents(Collections.singletonList(folderId));
+        if (StringUtils.isNotBlank(parentFolderId)) {
+            fileMetadata.setParents(Collections.singletonList(parentFolderId));
         }
 
         ByteArrayContent byteArrayContent = new ByteArrayContent(null, fileContent);
@@ -53,6 +53,6 @@ public class FileUploadCommand implements Command<File> {
     @Override
     public PlatformException onException(Exception exception) {
         String error = exception.getMessage(); // TODO: Fixme
-        return new FileCreateException(error, exception);
+        return new FileUploadException(error, exception);
     }
 }

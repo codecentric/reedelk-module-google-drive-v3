@@ -1,12 +1,23 @@
 package com.reedelk.google.drive.v3.component;
 
+import com.google.api.services.drive.model.File;
+import com.reedelk.google.drive.v3.internal.DriveApi;
+import com.reedelk.google.drive.v3.internal.DriveApiFactory;
+import com.reedelk.google.drive.v3.internal.attribute.CreateFolderAttributes;
+import com.reedelk.google.drive.v3.internal.command.CreateFolderCommand;
+import com.reedelk.google.drive.v3.internal.exception.CreateFolderException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
+import com.reedelk.runtime.api.message.MessageBuilder;
+import com.reedelk.runtime.api.message.content.MimeType;
+import com.reedelk.runtime.api.script.ScriptEngineService;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Create Folder")
@@ -48,8 +59,56 @@ public class CreateFolder implements ProcessorSync {
             "If not specified, the file will be placed directly in the service account's My Drive folder. ")
     private DynamicString parentFolderId;
 
+    @Reference
+    private ScriptEngineService scriptEngine;
+
+    private DriveApi driveApi;
+
+
+    @Override
+    public void initialize() {
+        requireNotNull(CreateFolder.class, folderName, "Google Drive Folder name must not be empty.");
+        driveApi = DriveApiFactory.create(CreateFolder.class, configuration);
+    }
+
     @Override
     public Message apply(FlowContext flowContext, Message message) {
-        return null;
+
+        String finalFolderName = scriptEngine.evaluate(folderName, flowContext, message)
+                .orElseThrow(() -> new CreateFolderException("Folder name must not be empty"));
+
+        String finalFolderDescription = scriptEngine.evaluate(folderDescription, flowContext, message)
+                .orElse(null);
+
+        String finalParentFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
+                .orElse(null);
+
+        CreateFolderCommand command =
+                new CreateFolderCommand(finalFolderName, finalFolderDescription, finalParentFolderId);
+
+        File folder = driveApi.execute(command);
+
+        CreateFolderAttributes attributes = new CreateFolderAttributes(folder);
+
+        return MessageBuilder.get(FileUpload.class)
+                .withString(folder.getId(), MimeType.TEXT_PLAIN)
+                .attributes(attributes)
+                .build();
+    }
+
+    public void setFolderDescription(DynamicString folderDescription) {
+        this.folderDescription = folderDescription;
+    }
+
+    public void setConfiguration(DriveConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    public void setParentFolderId(DynamicString parentFolderId) {
+        this.parentFolderId = parentFolderId;
+    }
+
+    public void setFolderName(DynamicString folderName) {
+        this.folderName = folderName;
     }
 }
