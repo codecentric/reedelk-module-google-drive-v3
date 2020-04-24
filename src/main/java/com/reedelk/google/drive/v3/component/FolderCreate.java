@@ -3,9 +3,9 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.attribute.CreateFolderAttributes;
-import com.reedelk.google.drive.v3.internal.command.CreateFolderCommand;
-import com.reedelk.google.drive.v3.internal.exception.CreateFolderException;
+import com.reedelk.google.drive.v3.internal.attribute.FolderCreateAttributes;
+import com.reedelk.google.drive.v3.internal.command.FolderCreateCommand;
+import com.reedelk.google.drive.v3.internal.exception.FolderCreateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -20,8 +20,8 @@ import org.osgi.service.component.annotations.Reference;
 import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNull;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Drive Create Folder")
-@Component(service = CreateFolder.class, scope = PROTOTYPE)
+@ModuleComponent("Drive Folder Create")
+@Component(service = FolderCreate.class, scope = PROTOTYPE)
 @Description("Creates a new folder in Google Drive with the given name and optional description. " +
         "The default folder owner will be the provided Service Account and permissions " +
         "on the folder must be used in order to assign further read/write permissions to other users. New permissions can be " +
@@ -31,7 +31,7 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
         "More info about Service Accounts and how they can be created and configured can " +
         "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
-public class CreateFolder implements ProcessorSync {
+public class FolderCreate implements ProcessorSync {
 
     @Property("Configuration")
     @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
@@ -67,15 +67,15 @@ public class CreateFolder implements ProcessorSync {
 
     @Override
     public void initialize() {
-        requireNotNull(CreateFolder.class, folderName, "Google Drive Folder name must not be empty.");
-        driveApi = DriveApiFactory.create(CreateFolder.class, configuration);
+        requireNotNull(FolderCreate.class, folderName, "Google Drive Folder name must not be empty.");
+        driveApi = DriveApiFactory.create(FolderCreate.class, configuration);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
         String finalFolderName = scriptEngine.evaluate(folderName, flowContext, message)
-                .orElseThrow(() -> new CreateFolderException("Folder name must not be empty"));
+                .orElseThrow(() -> new FolderCreateException("Folder name must not be empty"));
 
         String finalFolderDescription = scriptEngine.evaluate(folderDescription, flowContext, message)
                 .orElse(null);
@@ -83,12 +83,12 @@ public class CreateFolder implements ProcessorSync {
         String finalParentFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
                 .orElse(null);
 
-        CreateFolderCommand command =
-                new CreateFolderCommand(finalFolderName, finalFolderDescription, finalParentFolderId);
+        FolderCreateCommand command =
+                new FolderCreateCommand(finalFolderName, finalFolderDescription, finalParentFolderId);
 
         File folder = driveApi.execute(command);
 
-        CreateFolderAttributes attributes = new CreateFolderAttributes(folder);
+        FolderCreateAttributes attributes = new FolderCreateAttributes(folder);
 
         return MessageBuilder.get(FileUpload.class)
                 .withString(folder.getId(), MimeType.TEXT_PLAIN)
