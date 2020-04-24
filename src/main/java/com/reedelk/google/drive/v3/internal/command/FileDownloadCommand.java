@@ -1,17 +1,17 @@
 package com.reedelk.google.drive.v3.internal.command;
 
 import com.google.api.services.drive.Drive;
-import com.reedelk.google.drive.v3.internal.exception.FileReadException;
+import com.reedelk.google.drive.v3.internal.exception.FileDownloadException;
 import com.reedelk.runtime.api.exception.PlatformException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class FileReadCommand implements Command<byte[]> {
+public class FileDownloadCommand implements Command<byte[]> {
 
     private final String fileId;
 
-    public FileReadCommand(String fileId) {
+    public FileDownloadCommand(String fileId) {
         this.fileId = fileId;
     }
 
@@ -28,6 +28,6 @@ public class FileReadCommand implements Command<byte[]> {
     @Override
     public PlatformException onException(Exception exception) {
         String error = ""; // TODO: Fixme.
-        throw new FileReadException(error, exception);
+        throw new FileDownloadException(error, exception);
     }
 }

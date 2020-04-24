@@ -45,26 +45,17 @@ public class FileUpdate implements ProcessorSync {
     @Description("The ID of the file we want to update. The file ID is mandatory.")
     private DynamicString fileId;
 
-    @Property("Mime type")
-    @MimeTypeCombo
-    @Example(MimeType.AsString.TEXT_PLAIN)
-    @DefaultValue(MimeType.AsString.APPLICATION_BINARY)
-    @Description("The mime type of the file to be updated on Google Drive.")
-    private String mimeType;
-
     @Reference
     private ScriptEngineService scriptEngine;
     @Reference
     private ConverterService converterService;
 
-    private MimeType targetMimeType;
 
     private DriveApi driveApi;
 
     @Override
     public void initialize() {
         driveApi = DriveApiFactory.create(FileUpdate.class, configuration);
-        targetMimeType = MimeType.parse(mimeType, MimeType.TEXT_PLAIN);
     }
 
     @Override
@@ -77,7 +68,7 @@ public class FileUpdate implements ProcessorSync {
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-        FileUpdateCommand command = new FileUpdateCommand(realFileId, targetMimeType, fileContent);
+        FileUpdateCommand command = new FileUpdateCommand(realFileId, fileContent);
 
         driveApi.execute(command);
 
@@ -95,9 +86,5 @@ public class FileUpdate implements ProcessorSync {
 
     public void setFileId(DynamicString fileId) {
         this.fileId = fileId;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
     }
 }

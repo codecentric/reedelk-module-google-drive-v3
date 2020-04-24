@@ -51,7 +51,7 @@ public class PermissionCreate implements ProcessorSync {
             "If empty, the file ID is taken from the message payload.")
     private DynamicString fileId;
 
-    @Property("Type")
+    @Property("Permission Type")
     @InitValue("USER")
     @Example("GROUP")
     @DefaultValue("USER")
@@ -60,6 +60,13 @@ public class PermissionCreate implements ProcessorSync {
             "When type is domain, you must provide a domain. " +
             "There isn't extra information required for a anyone type.")
     private PermissionType type = PermissionType.USER;
+
+    @Property("Permission Role")
+    @Example("OWNER")
+    @InitValue("READER")
+    @DefaultValue("READER")
+    @Description("The role granted by this permission.")
+    private PermissionRole role = PermissionRole.READER;
 
     @Property("Email")
     @Hint("my-user@mydomain.com")
@@ -76,13 +83,6 @@ public class PermissionCreate implements ProcessorSync {
     @Description("The domain to which this permission refers.")
     @When(propertyName = "type", propertyValue = "DOMAIN")
     private DynamicString domain;
-
-    @Property("Role")
-    @Example("OWNER")
-    @InitValue("READER")
-    @DefaultValue("READER")
-    @Description("The role granted by this permission.")
-    private PermissionRole role = PermissionRole.READER;
 
     @Property("Send Notification Email")
     @Group("Advanced")

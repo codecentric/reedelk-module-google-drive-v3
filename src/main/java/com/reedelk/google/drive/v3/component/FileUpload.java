@@ -4,10 +4,9 @@ import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.FileCreateAttributes;
-import com.reedelk.google.drive.v3.internal.command.FileCreateCommand;
+import com.reedelk.google.drive.v3.internal.command.FileUploadCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileCreateException;
 import com.reedelk.runtime.api.annotation.*;
-import com.reedelk.runtime.api.commons.MimeTypeUtils;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -24,9 +23,9 @@ import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.require
 import static java.util.Optional.ofNullable;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
-@ModuleComponent("Drive File Create")
-@Component(service = FileCreate.class, scope = PROTOTYPE)
-@Description("Creates a new file in Google Drive with the given name and optional description. " +
+@ModuleComponent("Drive File Upload")
+@Component(service = FileUpload.class, scope = PROTOTYPE)
+@Description("Uploads a new file in Google Drive with the given name and optional description. " +
         "The content of the file is taken from the input message payload and if the file was successfully created " +
         "the ID of the file is returned in the output message payload. The default file owner will be the provided Service Account and permissions " +
         "on the file must be used in order to assign further read/write permissions to other users. New permissions can be " +
@@ -36,7 +35,7 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
         "More info about Service Accounts and how they can be created and configured can " +
         "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
-public class FileCreate implements ProcessorSync {
+public class FileUpload implements ProcessorSync {
 
     @Property("Configuration")
     @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
@@ -59,21 +58,12 @@ public class FileCreate implements ProcessorSync {
     @Description("A short description of the file.")
     private DynamicString fileDescription;
 
-    @Property("Auto mime type")
-    @Example("true")
-    @InitValue("true")
-    @DefaultValue("false")
-    @Description("If true, the mime type of the payload is determined from the file extension of the file name.")
-    private boolean autoMimeType;
-
-    @Property("Mime type")
-    @MimeTypeCombo
-    @Example(MimeType.AsString.IMAGE_JPEG)
-    @DefaultValue(MimeType.AsString.APPLICATION_BINARY)
-    @When(propertyName = "autoMimeType", propertyValue = "false")
-    @When(propertyName = "autoMimeType", propertyValue = When.BLANK)
-    @Description("The mime type of the file to be created on Google Drive.")
-    private String mimeType;
+    @Property("Parent Folder ID")
+    @Hint("0BwwA4oUTeiV1TGRPeTVjaWRDY1E")
+    @Example("0BwwA4oUTeiV1TGRPeTVjaWRDY1E")
+    @Description("The ID of the parent folder which contain the file.\n" +
+            "If not specified, the file will be placed directly in the service account's My Drive folder. ")
+    private DynamicString parentFolderId;
 
     @Property("Use content as indexable text")
     @DefaultValue("false")
@@ -93,8 +83,8 @@ public class FileCreate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        requireNotNull(FileCreate.class, fileName, "Google Drive File name must not be empty.");
-        driveApi = DriveApiFactory.create(FileCreate.class, configuration);
+        requireNotNull(FileUpload.class, fileName, "Google Drive File name must not be empty.");
+        driveApi = DriveApiFactory.create(FileUpload.class, configuration);
         realIndexableText = ofNullable(indexableText).orElse(CONTENT_AS_INDEXABLE_TEXT);
     }
 
@@ -104,23 +94,24 @@ public class FileCreate implements ProcessorSync {
         String finalFileName = scriptEngine.evaluate(fileName, flowContext, message)
                 .orElseThrow(() -> new FileCreateException("File name must not be empty"));
 
-        String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message).orElse(null);
+        String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message)
+                .orElse(null);
 
-        MimeType finalMimeType =
-                MimeTypeUtils.fromFileExtensionOrParse(autoMimeType, mimeType, finalFileName, MimeType.APPLICATION_BINARY);
+        String finalFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
+                .orElse(null);
 
         Object payload = message.payload();
 
         byte[] fileContent = converterService.convert(payload, byte[].class);
 
-        FileCreateCommand command =
-                new FileCreateCommand(finalFileName, finalFileDescription, finalMimeType, realIndexableText, fileContent);
+        FileUploadCommand command =
+                new FileUploadCommand(finalFileName, finalFileDescription, finalFolderId, realIndexableText, fileContent);
 
         File file = driveApi.execute(command);
 
         FileCreateAttributes attributes = new FileCreateAttributes(file);
 
-        return MessageBuilder.get(FileCreate.class)
+        return MessageBuilder.get(FileUpload.class)
                 .withString(file.getId(), MimeType.TEXT_PLAIN)
                 .attributes(attributes)
                 .build();
@@ -138,15 +129,11 @@ public class FileCreate implements ProcessorSync {
         this.indexableText = indexableText;
     }
 
-    public void setAutoMimeType(boolean autoMimeType) {
-        this.autoMimeType = autoMimeType;
-    }
-
     public void setFileName(DynamicString fileName) {
         this.fileName = fileName;
     }
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+    public void setParentFolderId(DynamicString parentFolderId) {
+        this.parentFolderId = parentFolderId;
     }
 }
