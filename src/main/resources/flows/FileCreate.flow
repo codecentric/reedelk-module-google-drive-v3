@@ -34,7 +34,7 @@
       "fileId": "#[message.payload()]",
       "type": "USER",
       "role": "READER",
-      "emailAddress": "gironi.lorenzo@gmail.com",
+      "emailAddress": "",
       "sendNotificationEmail": true
     }
   ]
