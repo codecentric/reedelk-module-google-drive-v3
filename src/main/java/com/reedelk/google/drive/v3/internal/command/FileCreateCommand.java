@@ -43,7 +43,7 @@ public class FileCreateCommand implements Command<File> {
         return drive.files()
                 .create(fileMetadata, byteArrayContent)
                 .setUseContentAsIndexableText(indexableText)
-                .setFields(join(",", FileCreateAttributes.ALL_ATTRIBUTES))
+                .setFields("*")
                 .execute();
     }
 

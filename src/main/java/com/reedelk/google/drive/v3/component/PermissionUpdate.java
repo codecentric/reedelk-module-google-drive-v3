@@ -45,13 +45,13 @@ public class PermissionUpdate implements ProcessorSync {
     @Property("File ID")
     @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
-    @Description("The ID of the file we want to list the permission. " +
-            "If empty, the file ID is taken from the message payload.")
+    @Description("The ID of the file we want to update the permission for.")
     private DynamicString fileId;
 
     @Property("Permission ID")
-    @Description("The ID of the permission we want to delete. " +
-            "If empty, the permission ID is taken from the message payload.")
+    @Hint("13346476095080557008")
+    @Example("13346476095080557008")
+    @Description("The ID of the permission we want to update. If empty, the permission ID is taken from the message payload.")
     private DynamicString permissionId;
 
     @Property("Role")
@@ -72,6 +72,8 @@ public class PermissionUpdate implements ProcessorSync {
     private PermissionType type = PermissionType.USER;
 
     @Property("Email")
+    @Hint("my-user@mydomain.com")
+    @Example("my-user@mydomain.com")
     @Description("The email address of the user or group to which this permission refers.")
     @When(propertyName = "type", propertyValue = "USER")
     @When(propertyName = "type", propertyValue = "GROUP")
@@ -79,6 +81,8 @@ public class PermissionUpdate implements ProcessorSync {
     private DynamicString emailAddress;
 
     @Property("Domain")
+    @Hint("www.mydomain.com")
+    @Example("www.mydomain.com")
     @Description("The domain to which this permission refers.")
     @When(propertyName = "type", propertyValue = "DOMAIN")
     private DynamicString domain;

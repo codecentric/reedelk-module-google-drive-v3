@@ -46,6 +46,8 @@ public class PermissionDelete implements ProcessorSync {
     private DynamicString fileId;
 
     @Property("Permission ID")
+    @Hint("13346476095080557008")
+    @Example("13346476095080557008")
     @Description("The ID of the permission we want to delete. " +
             "If empty, the permission ID is taken from the message payload.")
     private DynamicString permissionId;
