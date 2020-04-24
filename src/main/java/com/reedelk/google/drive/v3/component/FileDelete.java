@@ -25,8 +25,8 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 @ModuleComponent("Drive File Delete")
 @Component(service = FileDelete.class, scope = PROTOTYPE)
 @Description("Deletes a file with the given file ID from Google Drive. " +
-        "The ID of the file is taken from the input message payload if not defined in the 'File ID' property. " +
-        "A dynamic expression can be used to dynamically evaluate the file ID. " +
+        "The ID of the file to be deleted is taken from the input message payload if not defined in the 'File ID' property. " +
+        "An expression can be used to dynamically evaluate the file ID. " +
         "This component requires the configuration of a Service Account to make authorized API calls " +
         "on behalf of the user. The component's configuration uses the private key (in JSON format) " +
         "of the Google Service Account which can be generated and downloaded from the Service Account page. " +

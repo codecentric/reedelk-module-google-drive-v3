@@ -3,6 +3,7 @@ package com.reedelk.google.drive.v3.internal.command;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.reedelk.google.drive.v3.internal.attribute.FileUploadAttributes;
 import com.reedelk.google.drive.v3.internal.exception.FileUploadException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
@@ -24,10 +25,10 @@ public class FileUploadCommand implements Command<File> {
                              boolean indexableText,
                              byte[] fileContent) {
         this.fileDescription = fileDescription;
+        this.parentFolderId = parentFolderId;
         this.indexableText = indexableText;
         this.fileContent = fileContent;
         this.fileName = fileName;
-        this.parentFolderId = parentFolderId;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class FileUploadCommand implements Command<File> {
         return drive.files()
                 .create(fileMetadata, byteArrayContent)
                 .setUseContentAsIndexableText(indexableText)
-                .setFields("*")
+                .setFields(String.join(",", FileUploadAttributes.ALL_ATTRIBUTES))
                 .execute();
     }
 

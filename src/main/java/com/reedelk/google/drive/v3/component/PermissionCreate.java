@@ -128,7 +128,7 @@ public class PermissionCreate implements ProcessorSync {
 
         String permissionId = created.getId();
 
-        PermissionCreateAttribute attribute = new PermissionCreateAttribute(created.getId(), realFileId);
+        PermissionCreateAttribute attribute = new PermissionCreateAttribute(realFileId, created);
 
         return MessageBuilder.get(PermissionCreate.class)
                 .withString(permissionId, MimeType.TEXT_PLAIN)

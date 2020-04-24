@@ -3,7 +3,7 @@ package com.reedelk.google.drive.v3.component;
 import com.google.api.services.drive.model.File;
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.attribute.FileCreateAttributes;
+import com.reedelk.google.drive.v3.internal.attribute.FileUploadAttributes;
 import com.reedelk.google.drive.v3.internal.command.FileUploadCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileUploadException;
 import com.reedelk.runtime.api.annotation.*;
@@ -95,10 +95,10 @@ public class FileUpload implements ProcessorSync {
                 .orElseThrow(() -> new FileUploadException("File name must not be empty"));
 
         String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message)
-                .orElse(null);
+                .orElse(null); // Not mandatory.
 
         String finalParentFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
-                .orElse(null);
+                .orElse(null); // Not mandatory.
 
         Object payload = message.payload();
 
@@ -109,7 +109,7 @@ public class FileUpload implements ProcessorSync {
 
         File file = driveApi.execute(command);
 
-        FileCreateAttributes attributes = new FileCreateAttributes(file);
+        FileUploadAttributes attributes = new FileUploadAttributes(file);
 
         return MessageBuilder.get(FileUpload.class)
                 .withString(file.getId(), MimeType.TEXT_PLAIN)
@@ -125,15 +125,15 @@ public class FileUpload implements ProcessorSync {
         this.configuration = configuration;
     }
 
+    public void setParentFolderId(DynamicString parentFolderId) {
+        this.parentFolderId = parentFolderId;
+    }
+
     public void setIndexableText(Boolean indexableText) {
         this.indexableText = indexableText;
     }
 
     public void setFileName(DynamicString fileName) {
         this.fileName = fileName;
-    }
-
-    public void setParentFolderId(DynamicString parentFolderId) {
-        this.parentFolderId = parentFolderId;
     }
 }

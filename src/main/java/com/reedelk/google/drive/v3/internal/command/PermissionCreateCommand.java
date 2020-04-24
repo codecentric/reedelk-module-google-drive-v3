@@ -4,6 +4,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionCreateAttribute;
 import com.reedelk.google.drive.v3.internal.exception.PermissionCreateException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
@@ -11,6 +12,7 @@ import com.reedelk.runtime.api.exception.PlatformException;
 import java.io.IOException;
 
 import static com.reedelk.runtime.api.commons.Preconditions.checkState;
+import static java.lang.String.join;
 
 public class PermissionCreateCommand implements Command<Permission> {
 
@@ -64,7 +66,9 @@ public class PermissionCreateCommand implements Command<Permission> {
             create.setTransferOwnership(true);
         }
 
-        return create.execute();
+        return create
+                .setFields(join(",", PermissionCreateAttribute.ALL_ATTRIBUTES))
+                .execute();
     }
 
     @Override

@@ -3,8 +3,10 @@ package com.reedelk.google.drive.v3.component;
 import com.reedelk.google.drive.v3.internal.command.FileDeleteCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.runtime.api.commons.ModuleContext;
+import com.reedelk.runtime.api.exception.ComponentInputException;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageAttributes;
+import com.reedelk.runtime.api.message.MessageBuilder;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ class FileDeleteTest extends AbstractComponentTest {
         super.setUp();
         component.driveApi = driveApi;
         component.scriptEngine = scriptEngine;
+        component.converterService = converterService;
     }
 
     @Test
@@ -37,6 +40,24 @@ class FileDeleteTest extends AbstractComponentTest {
 
         // When
         component.apply(context, message);
+
+        // Then
+        verify(driveApi).execute(captor.capture());
+        FileDeleteCommand value = captor.getValue();
+
+        assertThat(value).hasFieldOrPropertyWithValue("fileId", fileIdToDelete);
+    }
+
+    @Test
+    void shouldInvokeCommandWithCorrectArgumentsWhenFileIdFromInputMessagePayload() {
+        // Given
+        String fileIdToDelete = UUID.randomUUID().toString();
+        Message input = MessageBuilder.get(TestComponent.class)
+                .withJavaObject(fileIdToDelete)
+                .build();
+
+        // When
+        component.apply(context, input);
 
         // Then
         verify(driveApi).execute(captor.capture());
@@ -79,5 +100,22 @@ class FileDeleteTest extends AbstractComponentTest {
         // Then
         assertThat(thrown)
                 .hasMessage("The File ID was null: I cannot delete a file with null ID (DynamicValue=[#[message.payload()]]).");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPayloadInputIsLong() {
+        // Given
+        Message input = MessageBuilder.get(TestComponent.class)
+                .withJavaObject(10L)
+                .build();
+
+        // When
+        ComponentInputException thrown =
+                assertThrows(ComponentInputException.class, () -> component.apply(context, input));
+
+        // Then
+        assertThat(thrown)
+                .hasMessage("FileDelete (com.reedelk.google.drive.v3.component.FileDelete) " +
+                        "was invoked with a not supported Input Type: actual=[Long], expected one of=[String,byte[]].");
     }
 }

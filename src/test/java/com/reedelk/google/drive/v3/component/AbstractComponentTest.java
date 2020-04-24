@@ -2,6 +2,7 @@ package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.command.FileDeleteCommand;
+import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.script.ScriptEngineService;
@@ -30,6 +31,8 @@ public abstract class AbstractComponentTest {
     protected DriveApi driveApi;
     @Mock
     protected ScriptEngineService scriptEngine;
+    @Mock
+    protected ConverterService converterService;
     @Captor
     protected ArgumentCaptor<FileDeleteCommand> captor = ArgumentCaptor.forClass(FileDeleteCommand.class);
 
@@ -39,5 +42,9 @@ public abstract class AbstractComponentTest {
             DynamicValue<?> dynamicValue = invocation.getArgument(0);
             return Optional.ofNullable(dynamicValue.value());
         }).when(scriptEngine).evaluate(any(DynamicValue.class), eq(context), eq(message));
+
+        lenient().doAnswer(invocation -> invocation.getArgument(0))
+                .when(converterService)
+                .convert(any(Object.class), any(Class.class));
     }
 }
