@@ -33,4 +33,21 @@ public class Messages {
             return null;
         }
     }
+
+    public enum FileDelete implements FormattedMessage {
+
+        FILE_ID_EMPTY("The File ID was empty: I cannot delete a file with empty ID."),
+        FILE_ID_NULL("The File ID was null: I cannot delete a file with null ID (DynamicValue=[%s]).");
+
+        private final String message;
+
+        FileDelete(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
 }

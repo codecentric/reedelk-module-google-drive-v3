@@ -7,12 +7,15 @@ import com.reedelk.runtime.api.exception.PlatformException;
 import java.io.IOException;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileCreate.GENERIC_ERROR;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDelete.FILE_ID_EMPTY;
+import static com.reedelk.runtime.api.commons.StringUtils.isBlank;
 
 public class FileDeleteCommand implements Command<Void> {
 
     private final String fileId;
 
     public FileDeleteCommand(String fileId) {
+        if (isBlank(fileId)) throw new FileDeleteException(FILE_ID_EMPTY.format(fileId));
         this.fileId = fileId;
     }
 

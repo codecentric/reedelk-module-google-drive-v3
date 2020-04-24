@@ -17,6 +17,7 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDelete.FILE_ID_NULL;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -59,14 +60,17 @@ public class FileDelete implements ProcessorSync {
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
+
         String realFileId;
         if (isNullOrBlank(fileId)) {
             // We take it from the message payload.
-            Object payload = message.payload(); // The payload might not be a string.
-            realFileId = converterService.convert(payload, String.class); // TODO: The ID must not be null add a check here.
+            // The payload might not be a string, therefore we must convert it.
+            // TODO: Input not supported check?
+            Object payload = message.payload();
+            realFileId = converterService.convert(payload, String.class);
         } else {
             realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                    .orElseThrow(() -> new FileDeleteException("File ID must not be null."));
+                    .orElseThrow(() -> new FileDeleteException(FILE_ID_NULL.format(fileId.value())));
         }
 
         FileDeleteCommand command = new FileDeleteCommand(realFileId);

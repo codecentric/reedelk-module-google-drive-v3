@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 public abstract class AbstractComponentTest {
@@ -33,10 +33,9 @@ public abstract class AbstractComponentTest {
     @Captor
     protected ArgumentCaptor<FileDeleteCommand> captor = ArgumentCaptor.forClass(FileDeleteCommand.class);
 
-
     @BeforeEach
     void setUp() {
-        doAnswer(invocation -> {
+        lenient().doAnswer(invocation -> {
             DynamicValue<?> dynamicValue = invocation.getArgument(0);
             return Optional.ofNullable(dynamicValue.value());
         }).when(scriptEngine).evaluate(any(DynamicValue.class), eq(context), eq(message));
