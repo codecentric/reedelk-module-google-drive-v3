@@ -5,7 +5,7 @@ import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 
-import static com.reedelk.runtime.api.commons.ConfigurationPreconditions.requireNotNullOrBlank;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Configuration.requireNotNullOrBlank;
 
 public class PermissionUtils {
 
