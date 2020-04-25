@@ -63,7 +63,7 @@ public class FileDownload implements ProcessorSync {
 
     @Override
     public void initialize() {
-        driveApi = DriveApiFactory.create(FileDownload.class, configuration);
+        driveApi = createApi();
         finalMimeType = MimeType.parse(mimeType, MimeType.APPLICATION_BINARY);
     }
 
@@ -108,5 +108,9 @@ public class FileDownload implements ProcessorSync {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+    DriveApi createApi() {
+        return DriveApiFactory.create(FileDownload.class, configuration);
     }
 }
