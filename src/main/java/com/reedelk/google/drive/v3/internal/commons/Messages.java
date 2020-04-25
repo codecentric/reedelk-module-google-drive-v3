@@ -43,6 +43,23 @@ public class Messages {
         }
     }
 
+    public enum FileList implements FormattedMessage {
+
+        GENERIC_ERROR("Could not list files from Google Drive with configuration " +
+                "query=[%s], orderBy=[%s], driveId=[%s], nextPageToken=[%s], pageSize=[%d], cause=[%s]");
+
+        private final String message;
+
+        FileList(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
     public enum Misc implements FormattedMessage {
 
         DRIVE_CREDENTIALS_ERROR_GENERIC("Could not create Google Drive Credentials, cause=[%s]"),

@@ -2,7 +2,6 @@ package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
-import com.reedelk.google.drive.v3.internal.attribute.FileListAttributes;
 import com.reedelk.google.drive.v3.internal.command.FileListCommand;
 import com.reedelk.google.drive.v3.internal.commons.Default;
 import com.reedelk.runtime.api.annotation.*;
@@ -15,7 +14,6 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +42,7 @@ public class FileList implements ProcessorSync {
     @Property("Drive ID")
     @Hint("my-drive-name")
     @Example("my-drive-name")
-    @Description("ID of the shared drive to search.")
+    @Description("ID of the shared drive to search for files.")
     private String driveId;
 
     @Property("Page Size")
@@ -91,7 +89,7 @@ public class FileList implements ProcessorSync {
             "</tr>" +
             "</table>")
     @Description("A query for filtering the file results. See the <a href=\"https://developers.google.com/drive/api/v3/search-files\">Search for files</a> guide for the supported syntax.")
-    private String query;
+    private DynamicString query;
 
     @Property("Order By")
     @Group("Filter And Order")
@@ -104,15 +102,15 @@ public class FileList implements ProcessorSync {
     private String orderBy;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     private int realPageSize;
 
     @Override
     public void initialize() {
-        driveApi = DriveApiFactory.create(FileList.class, configuration);
+        driveApi = createApi();
         realPageSize = Optional.ofNullable(pageSize).orElse(Default.PAGE_SIZE);
     }
 
@@ -122,16 +120,16 @@ public class FileList implements ProcessorSync {
         String realNextPageToken =
                 scriptEngine.evaluate(nextPageToken, flowContext, message).orElse(null);
 
+        String realQuery =
+                scriptEngine.evaluate(query, flowContext, message).orElse(null);
+
         FileListCommand command =
-                new FileListCommand(driveId, orderBy, query, realNextPageToken, realPageSize);
+                new FileListCommand(driveId, orderBy, realQuery, realNextPageToken, realPageSize);
 
         List<Map> driveFiles = driveApi.execute(command);
 
-        FileListAttributes attributes = new FileListAttributes();
-
         return MessageBuilder.get(FileList.class)
                 .withList(driveFiles, Map.class)
-                .attributes(attributes)
                 .build();
     }
 
@@ -155,7 +153,11 @@ public class FileList implements ProcessorSync {
         this.orderBy = orderBy;
     }
 
-    public void setQuery(String query) {
+    public void setQuery(DynamicString query) {
         this.query = query;
+    }
+
+    DriveApi createApi() {
+        return DriveApiFactory.create(FileList.class, configuration);
     }
 }

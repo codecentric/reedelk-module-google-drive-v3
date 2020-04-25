@@ -2,7 +2,6 @@ package com.reedelk.google.drive.v3.internal.command;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.FileList;
-import com.reedelk.google.drive.v3.internal.commons.Mappers;
 import com.reedelk.google.drive.v3.internal.exception.FileListException;
 import com.reedelk.runtime.api.exception.PlatformException;
 
@@ -10,6 +9,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static com.reedelk.google.drive.v3.internal.commons.Mappers.FromFile;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileList.GENERIC_ERROR;
+import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
 
 public class FileListCommand implements Command<List<Map>> {
@@ -41,17 +43,24 @@ public class FileListCommand implements Command<List<Map>> {
         list.setOrderBy(orderBy);
         list.setQ(query);
 
-        FileList files = list.setFields("*").execute();
+        FileList files = list.setFields(join(",", FromFile.FIELDS))
+                .execute();
 
         return files.getFiles()
                 .stream()
-                .map(Mappers.FILE)
+                .map(FromFile.GET)
                 .collect(toList());
     }
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = exception.getMessage(); // TODO: Fixme
+        String error = GENERIC_ERROR.format(
+                query,
+                orderBy,
+                driveId,
+                nextPageToken,
+                pageSize,
+                exception.getMessage());
         return new FileListException(error, exception);
     }
 }
