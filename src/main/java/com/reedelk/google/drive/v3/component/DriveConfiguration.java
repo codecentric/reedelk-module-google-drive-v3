@@ -1,11 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.reedelk.runtime.api.annotation.Description;
-import com.reedelk.runtime.api.annotation.Property;
-import com.reedelk.runtime.api.annotation.Shared;
-import com.reedelk.runtime.api.annotation.WidthAuto;
+import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.Implementor;
-import com.reedelk.runtime.api.resource.ResourceText;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
@@ -14,26 +10,34 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class DriveConfiguration implements Implementor {
 
     @WidthAuto
-    @Property("Service Account Credentials")
-    private String credentials;
+    @Hint("${RUNTIME_CONFIG}/my_credentials.json")
+    @Example("${RUNTIME_CONFIG}/my_credentials.json")
+    @Description("The path of the Google Service Account Credentials JSON file. " +
+            "Predefined runtime configuration properties (such as '${RUNTIME_CONFIG}') can be used in the path to " +
+            "reference files from the ${RUNTIME_HOME}/config directory.")
+    @Property("Service Account Credentials File")
+    private String credentialsFile;
 
-    @Property("Service User Email")
-    @Description("The email of the user account to impersonate, if delegating domain-wide authority to the service account.")
-    private String serviceAccountEmail;
+    @Property("Service Account User Email")
+    @Hint("my.user.account@gmail.com")
+    @Example("my.user.account@gmail.com")
+    @Description("The email of the user account to impersonate, when the 'delegating domain-wide authority' " +
+            "flag is activated for the Service Account.")
+    private String credentialsEmail;
 
-    public String getCredentials() {
-        return credentials;
+    public String getCredentialsFile() {
+        return credentialsFile;
     }
 
-    public void setCredentials(String credentials) {
-        this.credentials = credentials;
+    public void setCredentialsFile(String credentialsFile) {
+        this.credentialsFile = credentialsFile;
     }
 
-    public String getServiceAccountEmail() {
-        return serviceAccountEmail;
+    public String getCredentialsEmail() {
+        return credentialsEmail;
     }
 
-    public void setServiceAccountEmail(String serviceAccountEmail) {
-        this.serviceAccountEmail = serviceAccountEmail;
+    public void setCredentialsEmail(String credentialsEmail) {
+        this.credentialsEmail = credentialsEmail;
     }
 }

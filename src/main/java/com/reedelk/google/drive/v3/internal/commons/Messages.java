@@ -50,4 +50,21 @@ public class Messages {
             return message;
         }
     }
+
+    public enum Misc implements FormattedMessage {
+
+        DRIVE_CREDENTIALS_ERROR_GENERIC("Could not create Google Drive Credentials, cause=[%s]"),
+        DRIVE_CREDENTIALS_ERROR("Could not create Google Drive Credentials from file path=[%s], cause=[%s]");
+
+        private final String message;
+
+        Misc(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
 }

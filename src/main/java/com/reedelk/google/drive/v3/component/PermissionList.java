@@ -40,7 +40,7 @@ public class PermissionList implements ProcessorSync {
             "be found at the following <a href=\"https://cloud.google.com/iam/docs/service-accounts\">link</a>.")
     private DriveConfiguration configuration;
 
-    @Property("File ID")
+    @Property("Permission File ID")
     @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file we want to list the permission. " +
