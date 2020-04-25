@@ -17,6 +17,7 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileUpdate.FILE_ID_NULL;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive File Update")
@@ -46,12 +47,11 @@ public class FileUpdate implements ProcessorSync {
     private DynamicString fileId;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     @Override
     public void initialize() {
@@ -62,7 +62,7 @@ public class FileUpdate implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                .orElseThrow(() -> new FileUpdateException("File ID must not be null."));
+                .orElseThrow(() -> new FileUpdateException(FILE_ID_NULL.format(fileId.value())));
 
         Object payload = message.payload();
 

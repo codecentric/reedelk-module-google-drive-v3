@@ -60,6 +60,23 @@ public class Messages {
         }
     }
 
+    public enum FileUpdate implements FormattedMessage {
+
+        FILE_ID_NULL("The File ID was null: I cannot update a file with null ID (DynamicValue=[%s])."),
+        FILE_ID_EMPTY("The File ID was empty: I cannot update a file from an empty File ID.");
+
+        private final String message;
+
+        FileUpdate(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
     public enum PermissionList implements FormattedMessage {
 
         GENERIC_ERROR("Could not list permissions from Google Drive for File ID=[%s], cause=[%s].");
