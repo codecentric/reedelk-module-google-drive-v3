@@ -13,21 +13,19 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Component(service = DriveConfiguration.class, scope = ServiceScope.PROTOTYPE)
 public class DriveConfiguration implements Implementor {
 
-    // TODO: This one should be from config? Or a system property?
-    //  or a config property?
     @WidthAuto
     @Property("Service Account Credentials")
-    private ResourceText credentials;
+    private String credentials;
 
     @Property("Service User Email")
     @Description("The email of the user account to impersonate, if delegating domain-wide authority to the service account.")
     private String serviceAccountEmail;
 
-    public ResourceText getCredentials() {
+    public String getCredentials() {
         return credentials;
     }
 
-    public void setCredentials(ResourceText credentials) {
+    public void setCredentials(String credentials) {
         this.credentials = credentials;
     }
 

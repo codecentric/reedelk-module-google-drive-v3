@@ -11,15 +11,12 @@ import com.google.auth.Credentials;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.reedelk.google.drive.v3.component.DriveConfiguration;
-import com.reedelk.runtime.api.commons.StreamUtils;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.component.Implementor;
 import com.reedelk.runtime.api.exception.PlatformException;
-import com.reedelk.runtime.api.resource.ResourceText;
 
-import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Configuration.requireNotNull;
@@ -46,22 +43,24 @@ public class DriveApiFactory {
 
             return new DriveApi(service);
         } catch (IOException | GeneralSecurityException e) {
+            // TODO: Better error message.
             throw new PlatformException(e);
         }
     }
 
     private static Credentials getCredentials(DriveConfiguration configuration) throws IOException, GeneralSecurityException {
-        ResourceText credentialsResource = configuration.getCredentials();
+        String credentialsFilePath = configuration.getCredentials();
         String serviceAccountEmail = configuration.getServiceAccountEmail();
-        String credentialsAsJson = StreamUtils.FromString.consume(credentialsResource.data());// TODO: Create a method (data as input stream in core API).
-        ServiceAccountCredentials.Builder builder = ServiceAccountCredentials.fromStream(new ByteArrayInputStream(credentialsAsJson.getBytes(StandardCharsets.UTF_8)))
-                .toBuilder()
-                .setScopes(DriveScopes.all());
-        if (StringUtils.isNotBlank(serviceAccountEmail)) {
-            // The email of the user account to impersonate,
-            // if delegating domain-wide authority to the service account.
-            builder.setServiceAccountUser(serviceAccountEmail);
+        try (FileInputStream is = new FileInputStream(credentialsFilePath)) {
+            ServiceAccountCredentials.Builder builder = ServiceAccountCredentials.fromStream(is)
+                    .toBuilder()
+                    .setScopes(DriveScopes.all());
+            if (StringUtils.isNotBlank(serviceAccountEmail)) {
+                // The email of the user account to impersonate,
+                // if delegating domain-wide authority to the service account.
+                builder.setServiceAccountUser(serviceAccountEmail);
+            }
+            return builder.build();
         }
-        return builder.build();
     }
 }

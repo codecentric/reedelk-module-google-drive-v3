@@ -6,6 +6,7 @@ import com.reedelk.google.drive.v3.internal.attribute.FileDownloadAttributes;
 import com.reedelk.google.drive.v3.internal.command.FileDownloadCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileDownloadException;
 import com.reedelk.runtime.api.annotation.*;
+import com.reedelk.runtime.api.commons.ComponentPrecondition;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -17,6 +18,7 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.*;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -70,9 +72,16 @@ public class FileDownload implements ProcessorSync {
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
-            // We take it from the message payload.
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the File ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
+
             Object payload = message.payload(); // The payload might not be a string.
+
+            Input.requireTypeMatchesAny(FileDownload.class, payload, String.class, byte[].class);
+
             realFileId = converterService.convert(payload, String.class);
+
         } else {
             realFileId = scriptEngine.evaluate(fileId, flowContext, message)
                     .orElseThrow(() -> new FileDownloadException("File ID must not be null."));

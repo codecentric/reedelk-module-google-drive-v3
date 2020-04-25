@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class FileDownloadAttributes extends HashMap<String, Serializable> {
 
-    private static final String ATTR_ID = "fileId";
+    private static final String ATTR_ID = "id";
 
     public FileDownloadAttributes(String fileId) {
         put(ATTR_ID, fileId);
