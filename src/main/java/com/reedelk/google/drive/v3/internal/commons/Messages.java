@@ -132,6 +132,25 @@ public class Messages {
         }
     }
 
+    public enum PermissionDelete implements FormattedMessage {
+
+        PERMISSION_ID_NULL("The Permission ID was null: I cannot delete a permission for a file with null permission ID (DynamicValue=[%s])."),
+        FILE_ID_NULL("The File ID was null: I cannot delete a permission for a file with null ID (DynamicValue=[%s])."),
+        GENERIC_ERROR("Could not delete permission for file on Google Drive with configuration " +
+                "permissionId=[%s], fileId=[%s], cause=[%s].");
+
+        private final String message;
+
+        PermissionDelete(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
     public enum PermissionList implements FormattedMessage {
 
         GENERIC_ERROR("Could not list permissions from Google Drive for File ID=[%s], cause=[%s].");

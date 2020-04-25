@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class PermissionDeleteAttribute extends HashMap<String, Serializable> {
 
-    private static final String ATTR_ID = "permissionId";
+    private static final String ATTR_ID = "id";
     private static final String ATTR_FILE_ID = "fileId";
 
     public PermissionDeleteAttribute(String permissionId, String fileId) {

@@ -17,6 +17,9 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionDelete.FILE_ID_NULL;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionDelete.PERMISSION_ID_NULL;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -53,11 +56,11 @@ public class PermissionDelete implements ProcessorSync {
     private DynamicString permissionId;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     @Override
     public void initialize() {
@@ -68,17 +71,22 @@ public class PermissionDelete implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                .orElseThrow(() -> new PermissionDeleteException("File ID must not be null."));
+                .orElseThrow(() -> new PermissionDeleteException(FILE_ID_NULL.format(fileId.value())));
 
         String realPermissionId;
         if (isNullOrBlank(permissionId)) {
-            // We take it from the message payload.
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the Permission ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
             Object payload = message.payload(); // The payload might not be a string.
+
+            Input.requireTypeMatchesAny(PermissionDelete.class, payload, String.class, byte[].class);
+
             realPermissionId = converterService.convert(payload, String.class);
 
         } else {
             realPermissionId = scriptEngine.evaluate(permissionId, flowContext, message)
-                    .orElseThrow(() -> new PermissionDeleteException("Permission ID must not be null."));
+                    .orElseThrow(() -> new PermissionDeleteException(PERMISSION_ID_NULL.format(permissionId.value())));
         }
 
         PermissionDeleteCommand command = new PermissionDeleteCommand(realPermissionId, realFileId);
@@ -87,7 +95,7 @@ public class PermissionDelete implements ProcessorSync {
 
         PermissionDeleteAttribute attribute = new PermissionDeleteAttribute(realPermissionId, realFileId);
 
-        return MessageBuilder.get(FileDelete.class)
+        return MessageBuilder.get(PermissionDelete.class)
                 .withString(realPermissionId, MimeType.TEXT_PLAIN)
                 .attributes(attribute)
                 .build();

@@ -2,10 +2,11 @@ package com.reedelk.google.drive.v3.internal.command;
 
 import com.google.api.services.drive.Drive;
 import com.reedelk.google.drive.v3.internal.exception.PermissionDeleteException;
-import com.reedelk.runtime.api.commons.StackTraceUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
 
 import java.io.IOException;
+
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionDelete.GENERIC_ERROR;
 
 public class PermissionDeleteCommand implements Command<Void> {
 
@@ -27,7 +28,7 @@ public class PermissionDeleteCommand implements Command<Void> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = exception.getMessage(); // TODO:
+        String error = GENERIC_ERROR.format(permissionId, fileId, exception.getMessage());
         return new PermissionDeleteException(error, exception);
     }
 }
