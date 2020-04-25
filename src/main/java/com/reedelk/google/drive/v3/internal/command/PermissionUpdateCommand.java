@@ -4,6 +4,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
+import com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate;
 import com.reedelk.google.drive.v3.internal.exception.PermissionUpdateException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
@@ -67,7 +68,13 @@ public class PermissionUpdateCommand implements Command<Permission> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = "";
+        String error = PermissionUpdate.GENERIC_ERROR.format(
+                fileId,
+                type,
+                role,
+                emailAddress,
+                domain,
+                exception.getMessage());
         return new PermissionUpdateException(error, exception);
     }
 }

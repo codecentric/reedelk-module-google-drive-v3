@@ -92,11 +92,11 @@ public class PermissionCreate implements ProcessorSync {
     private Boolean sendNotificationEmail;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     private Boolean realSendNotificationEmail;
 

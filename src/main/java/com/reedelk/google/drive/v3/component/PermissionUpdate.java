@@ -5,12 +5,11 @@ import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionUpdateAttribute;
 import com.reedelk.google.drive.v3.internal.command.PermissionUpdateCommand;
-import com.reedelk.google.drive.v3.internal.commons.PermissionUtils;
-import com.reedelk.google.drive.v3.internal.exception.PermissionDeleteException;
+import com.reedelk.google.drive.v3.internal.commons.Messages;
+import com.reedelk.google.drive.v3.internal.exception.PermissionUpdateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
-import com.reedelk.runtime.api.exception.PlatformException;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageBuilder;
@@ -20,6 +19,9 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.*;
+import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.checkPreconditions;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -88,39 +90,38 @@ public class PermissionUpdate implements ProcessorSync {
     private DynamicString domain;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     @Override
     public void initialize() {
         driveApi = DriveApiFactory.create(PermissionUpdate.class, configuration);
-        PermissionUtils.checkPreconditions(role, type, emailAddress, domain);
+        checkPreconditions(role, type, emailAddress, domain);
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
-        String realFileId;
-        if (isNullOrBlank(fileId)) {
-            // We take it from the message payload.
-            Object payload = message.payload(); // The payload might not be a string.
-            realFileId = converterService.convert(payload, String.class);
-        } else {
-            realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                    .orElseThrow(() -> new PlatformException("File ID must not be null."));
-        }
+        String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
+                .orElseThrow(() -> new PermissionUpdateException(FILE_ID_NULL.format(fileId.value())));
 
         String realPermissionId;
         if (isNullOrBlank(permissionId)) {
-            // We take it from the message payload.
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the Permission ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
             Object payload = message.payload(); // The payload might not be a string.
+
+            Input.requireTypeMatchesAny(PermissionUpdate.class, payload, String.class, byte[].class);
+
             realPermissionId = converterService.convert(payload, String.class);
+
         } else {
             realPermissionId = scriptEngine.evaluate(permissionId, flowContext, message)
-                    .orElseThrow(() -> new PermissionDeleteException("Permission ID must not be null."));
+                    .orElseThrow(() -> new PermissionUpdateException(PERMISSION_ID_NULL.format(permissionId.value())));
         }
 
         String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message).orElse(null);
@@ -135,7 +136,7 @@ public class PermissionUpdate implements ProcessorSync {
 
         PermissionUpdateAttribute attribute = new PermissionUpdateAttribute(permissionId, realFileId);
 
-        return MessageBuilder.get(PermissionCreate.class)
+        return MessageBuilder.get(PermissionUpdate.class)
                 .withString(permissionId, MimeType.TEXT_PLAIN)
                 .attributes(attribute)
                 .build();

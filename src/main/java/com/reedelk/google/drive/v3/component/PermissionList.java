@@ -19,6 +19,8 @@ import org.osgi.service.component.annotations.Reference;
 import java.util.List;
 import java.util.Map;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionList.FILE_ID_NULL;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -48,11 +50,11 @@ public class PermissionList implements ProcessorSync {
     private DynamicString fileId;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     @Override
     public void initialize() {
@@ -65,12 +67,18 @@ public class PermissionList implements ProcessorSync {
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
-            // We take it from the message payload.
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the File ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
             Object payload = message.payload(); // The payload might not be a string.
+
+            Input.requireTypeMatchesAny(PermissionList.class, payload, String.class, byte[].class);
+
             realFileId = converterService.convert(payload, String.class);
+
         } else {
             realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                    .orElseThrow(() -> new PermissionListException("File ID must not be null."));
+                    .orElseThrow(() -> new PermissionListException(FILE_ID_NULL.format(fileId.value())));
         }
 
         PermissionListCommand command = new PermissionListCommand(realFileId);
@@ -79,7 +87,7 @@ public class PermissionList implements ProcessorSync {
 
         PermissionListAttribute attribute = new PermissionListAttribute(realFileId);
 
-        return MessageBuilder.get(FileDelete.class)
+        return MessageBuilder.get(PermissionList.class)
                 .withList(permissions, Map.class)
                 .attributes(attribute)
                 .build();
