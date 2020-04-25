@@ -5,10 +5,10 @@ import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionCreateAttribute;
 import com.reedelk.google.drive.v3.internal.command.PermissionCreateCommand;
+import com.reedelk.google.drive.v3.internal.exception.PermissionCreateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
-import com.reedelk.runtime.api.exception.PlatformException;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageBuilder;
@@ -21,7 +21,9 @@ import org.osgi.service.component.annotations.Reference;
 import java.util.Optional;
 
 import static com.reedelk.google.drive.v3.internal.commons.Default.SEND_NOTIFICATION_EMAIL;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionCreate.FILE_ID_NULL;
 import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.checkPreconditions;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -110,12 +112,18 @@ public class PermissionCreate implements ProcessorSync {
 
         String realFileId;
         if (isNullOrBlank(fileId)) {
-            // We take it from the message payload.
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the File ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
             Object payload = message.payload(); // The payload might not be a string.
+
+            Input.requireTypeMatchesAny(PermissionCreate.class, payload, String.class, byte[].class);
+
             realFileId = converterService.convert(payload, String.class);
+
         } else {
             realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                    .orElseThrow(() -> new PlatformException("File ID must not be null."));
+                    .orElseThrow(() -> new PermissionCreateException(FILE_ID_NULL.format(fileId.value())));
         }
 
         String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message).orElse(null);

@@ -5,6 +5,7 @@ import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionCreateAttribute;
+import com.reedelk.google.drive.v3.internal.commons.Messages;
 import com.reedelk.google.drive.v3.internal.exception.PermissionCreateException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
@@ -73,7 +74,14 @@ public class PermissionCreateCommand implements Command<Permission> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = "";
+        String error = Messages.PermissionCreate.GENERIC_ERROR.format(
+                fileId,
+                type,
+                role,
+                emailAddress,
+                domain,
+                sendNotificationEmail,
+                exception.getMessage());
         return new PermissionCreateException(error, exception);
     }
 }

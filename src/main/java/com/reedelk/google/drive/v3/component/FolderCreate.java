@@ -17,6 +17,7 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FolderCreate.FOLDER_NAME_EMPTY;
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Configuration.requireNotNull;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -64,7 +65,6 @@ public class FolderCreate implements ProcessorSync {
 
     private DriveApi driveApi;
 
-
     @Override
     public void initialize() {
         requireNotNull(FolderCreate.class, folderName, "Google Drive Folder name must not be empty.");
@@ -75,13 +75,13 @@ public class FolderCreate implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String finalFolderName = scriptEngine.evaluate(folderName, flowContext, message)
-                .orElseThrow(() -> new FolderCreateException("Folder name must not be empty"));
+                .orElseThrow(() -> new FolderCreateException(FOLDER_NAME_EMPTY.format(folderName.value())));
 
         String finalFolderDescription = scriptEngine.evaluate(folderDescription, flowContext, message)
-                .orElse(null);
+                .orElse(null); // Not mandatory.
 
         String finalParentFolderId = scriptEngine.evaluate(parentFolderId, flowContext, message)
-                .orElse(null);
+                .orElse(null); // Not mandatory.
 
         FolderCreateCommand command =
                 new FolderCreateCommand(finalFolderName, finalFolderDescription, finalParentFolderId);
@@ -90,7 +90,7 @@ public class FolderCreate implements ProcessorSync {
 
         FolderCreateAttributes attributes = new FolderCreateAttributes(folder);
 
-        return MessageBuilder.get(FileUpload.class)
+        return MessageBuilder.get(FolderCreate.class)
                 .withString(folder.getId(), MimeType.TEXT_PLAIN)
                 .attributes(attributes)
                 .build();

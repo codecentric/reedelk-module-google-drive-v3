@@ -96,6 +96,42 @@ public class Messages {
         }
     }
 
+    public enum FolderCreate implements FormattedMessage {
+
+        FOLDER_NAME_EMPTY("The Folder name was empty: I cannot create a folder with an empty name (DynamicValue=[%s])."),
+        GENERIC_ERROR("Could not create folder on Google Drive with configuration " +
+                "folderName=[%s], parentFolderId=[%s], folderDescription=[%s], cause=[%s].");
+
+        private final String message;
+
+        FolderCreate(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
+    public enum PermissionCreate implements FormattedMessage {
+
+        FILE_ID_NULL("The File ID was null: I cannot create a permission for a file with null ID (DynamicValue=[%s])."),
+        GENERIC_ERROR("Could not create permission for file on Google Drive with configuration " +
+                "fileId=[%s], type=[%s], role=[%s], emailAddress=[%s], domain=[%s], sendNotificationEmail=[%s], cause=[%s].");
+
+        private final String message;
+
+        PermissionCreate(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
     public enum PermissionList implements FormattedMessage {
 
         GENERIC_ERROR("Could not list permissions from Google Drive for File ID=[%s], cause=[%s].");

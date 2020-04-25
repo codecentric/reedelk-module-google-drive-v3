@@ -75,6 +75,7 @@ public class PermissionDelete implements ProcessorSync {
             // We take it from the message payload.
             Object payload = message.payload(); // The payload might not be a string.
             realPermissionId = converterService.convert(payload, String.class);
+
         } else {
             realPermissionId = scriptEngine.evaluate(permissionId, flowContext, message)
                     .orElseThrow(() -> new PermissionDeleteException("Permission ID must not be null."));
