@@ -24,9 +24,9 @@ public class FileListCommand implements Command<List<Map>> {
 
     public FileListCommand(String driveId,
                            String orderBy,
-                           String query,
+                           int pageSize,
                            String nextPageToken,
-                           int pageSize) {
+                           String query) {
         this.nextPageToken = nextPageToken;
         this.pageSize = pageSize;
         this.driveId = driveId;

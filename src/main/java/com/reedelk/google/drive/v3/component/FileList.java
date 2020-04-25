@@ -124,7 +124,7 @@ public class FileList implements ProcessorSync {
                 scriptEngine.evaluate(query, flowContext, message).orElse(null);
 
         FileListCommand command =
-                new FileListCommand(driveId, orderBy, realQuery, realNextPageToken, realPageSize);
+                new FileListCommand(driveId, orderBy, realPageSize, realNextPageToken, realQuery);
 
         List<Map> driveFiles = driveApi.execute(command);
 
