@@ -9,7 +9,7 @@ public class Messages {
 
     public enum FileDelete implements FormattedMessage {
 
-        GENERIC_ERROR("The file with File ID=[%s] could not be deleted on Google Drive, cause=[%s]"),
+        GENERIC_ERROR("The file with File ID=[%s] could not be deleted on Google Drive, cause=[%s]."),
         FILE_ID_EMPTY("The File ID was empty: I cannot delete a file from an empty File ID."),
         FILE_ID_NULL("The File ID was null: I cannot delete a file with null ID (DynamicValue=[%s]).");
 
@@ -27,7 +27,7 @@ public class Messages {
 
     public enum FileDownload implements FormattedMessage {
 
-        GENERIC_ERROR("The file with File ID=[%s] could not be downloaded from Google Drive, cause=[%s]"),
+        GENERIC_ERROR("The file with File ID=[%s] could not be downloaded from Google Drive, cause=[%s]."),
         FILE_ID_EMPTY("The File ID was empty: I cannot download a file from an empty File ID."),
         FILE_ID_NULL("The File ID was null: I cannot download a file with null ID (DynamicValue=[%s]).");
 
@@ -46,11 +46,27 @@ public class Messages {
     public enum FileList implements FormattedMessage {
 
         GENERIC_ERROR("Could not list files from Google Drive with configuration " +
-                "query=[%s], orderBy=[%s], driveId=[%s], nextPageToken=[%s], pageSize=[%d], cause=[%s]");
+                "query=[%s], orderBy=[%s], driveId=[%s], nextPageToken=[%s], pageSize=[%d], cause=[%s].");
 
         private final String message;
 
         FileList(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
+    public enum PermissionList implements FormattedMessage {
+
+        GENERIC_ERROR("Could not list permissions from Google Drive for File ID=[%s], cause=[%s].");
+
+        private final String message;
+
+        PermissionList(String message) {
             this.message = message;
         }
 
