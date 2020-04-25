@@ -7,11 +7,18 @@ import com.reedelk.runtime.api.exception.PlatformException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDownload.FILE_ID_EMPTY;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDownload.GENERIC_ERROR;
+import static com.reedelk.runtime.api.commons.StringUtils.isBlank;
+
 public class FileDownloadCommand implements Command<byte[]> {
 
     private final String fileId;
 
     public FileDownloadCommand(String fileId) {
+        if (isBlank(fileId)) {
+            throw new FileDownloadException(FILE_ID_EMPTY.format(fileId));
+        }
         this.fileId = fileId;
     }
 
@@ -27,7 +34,7 @@ public class FileDownloadCommand implements Command<byte[]> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = ""; // TODO: Fixme.
+        String error = GENERIC_ERROR.format(fileId, exception.getMessage());
         throw new FileDownloadException(error, exception);
     }
 }

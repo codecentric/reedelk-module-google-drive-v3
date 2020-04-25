@@ -2,6 +2,5 @@
   "id": "314f4dc1-5809-4e3d-934e-03519709d619",
   "title": "Google Drive Configuration",
   "implementor": "com.reedelk.google.drive.v3.component.DriveConfiguration",
-  "applicationName": "Reedelk",
-  "credentials": "assets/my_credentials.json"
+  "credentialsFile": "${RUNTIME_CONFIG}/my_credentials.json"
 }

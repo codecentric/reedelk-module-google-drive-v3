@@ -6,7 +6,6 @@ import com.reedelk.google.drive.v3.internal.attribute.FileDownloadAttributes;
 import com.reedelk.google.drive.v3.internal.command.FileDownloadCommand;
 import com.reedelk.google.drive.v3.internal.exception.FileDownloadException;
 import com.reedelk.runtime.api.annotation.*;
-import com.reedelk.runtime.api.commons.ComponentPrecondition;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -18,7 +17,8 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import static com.reedelk.runtime.api.commons.ComponentPrecondition.*;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDownload.FILE_ID_NULL;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
@@ -50,15 +50,15 @@ public class FileDownload implements ProcessorSync {
     @MimeTypeCombo
     @Example(MimeType.AsString.IMAGE_JPEG)
     @DefaultValue(MimeType.AsString.APPLICATION_BINARY)
-    @Description("The mime type of the file retrieved from Google Drive.")
+    @Description("The mime type of the file to download from Google Drive.")
     private String mimeType;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
     private MimeType finalMimeType;
 
     @Override
@@ -75,7 +75,6 @@ public class FileDownload implements ProcessorSync {
             // We take it from the message payload. The payload might not be a string,
             // for example when we upload the File ID from a rest listener and we forget
             // the mime type, therefore we have to convert it to a string type.
-
             Object payload = message.payload(); // The payload might not be a string.
 
             Input.requireTypeMatchesAny(FileDownload.class, payload, String.class, byte[].class);
@@ -84,7 +83,7 @@ public class FileDownload implements ProcessorSync {
 
         } else {
             realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                    .orElseThrow(() -> new FileDownloadException("File ID must not be null."));
+                    .orElseThrow(() -> new FileDownloadException(FILE_ID_NULL.format(fileId.value())));
         }
 
         FileDownloadCommand command = new FileDownloadCommand(realFileId);
@@ -94,8 +93,8 @@ public class FileDownload implements ProcessorSync {
         FileDownloadAttributes attributes = new FileDownloadAttributes(realFileId);
 
         return MessageBuilder.get(FileDownload.class)
-                .attributes(attributes)
                 .withBinary(content, finalMimeType)
+                .attributes(attributes)
                 .build();
     }
 

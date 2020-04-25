@@ -67,7 +67,6 @@ public class FileDelete implements ProcessorSync {
             // We take it from the message payload. The payload might not be a string,
             // for example when we upload the File ID from a rest listener and we forget
             // the mime type, therefore we have to convert it to a string type.
-
             Object payload = message.payload();
 
             Input.requireTypeMatchesAny(FileDelete.class, payload, String.class, byte[].class);

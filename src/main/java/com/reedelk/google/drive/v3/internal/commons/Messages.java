@@ -7,15 +7,15 @@ public class Messages {
     private Messages() {
     }
 
-    public enum FileCreate implements FormattedMessage {
+    public enum FileDelete implements FormattedMessage {
 
-        FILE_NAME_EMPTY("The file name to be created on Google Drive must not be empty (DynamicValue=[%s])."),
-        GENERIC_ERROR("The file with name=[%s] could not be created on Google Drive, cause=[%s]");
+        GENERIC_ERROR("The file with File ID=[%s] could not be deleted on Google Drive, cause=[%s]"),
+        FILE_ID_EMPTY("The File ID was empty: I cannot delete a file from an empty File ID."),
+        FILE_ID_NULL("The File ID was null: I cannot delete a file with null ID (DynamicValue=[%s]).");
 
+        private final String message;
 
-        private String message;
-
-        FileCreate(String message) {
+        FileDelete(String message) {
             this.message = message;
         }
 
@@ -25,23 +25,15 @@ public class Messages {
         }
     }
 
-    public enum FileRead implements FormattedMessage {
-        ;
+    public enum FileDownload implements FormattedMessage {
 
-        @Override
-        public String template() {
-            return null;
-        }
-    }
-
-    public enum FileDelete implements FormattedMessage {
-
-        FILE_ID_EMPTY("The File ID was empty: I cannot delete a file with empty ID."),
-        FILE_ID_NULL("The File ID was null: I cannot delete a file with null ID (DynamicValue=[%s]).");
+        GENERIC_ERROR("The file with File ID=[%s] could not be downloaded from Google Drive, cause=[%s]"),
+        FILE_ID_EMPTY("The File ID was empty: I cannot download a file from an empty File ID."),
+        FILE_ID_NULL("The File ID was null: I cannot download a file with null ID (DynamicValue=[%s]).");
 
         private final String message;
 
-        FileDelete(String message) {
+        FileDownload(String message) {
             this.message = message;
         }
 

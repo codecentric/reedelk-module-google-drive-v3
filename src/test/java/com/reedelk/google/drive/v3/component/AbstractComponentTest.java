@@ -33,8 +33,6 @@ public abstract class AbstractComponentTest {
     protected ScriptEngineService scriptEngine;
     @Mock
     protected ConverterService converterService;
-    @Captor
-    protected ArgumentCaptor<FileDeleteCommand> captor = ArgumentCaptor.forClass(FileDeleteCommand.class);
 
     @BeforeEach
     void setUp() {

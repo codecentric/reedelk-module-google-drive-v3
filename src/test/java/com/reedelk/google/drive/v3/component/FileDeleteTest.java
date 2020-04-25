@@ -10,6 +10,8 @@ import com.reedelk.runtime.api.message.MessageBuilder;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +23,9 @@ import static org.mockito.Mockito.verify;
 
 
 class FileDeleteTest extends AbstractComponentTest {
+
+    @Captor
+    protected ArgumentCaptor<FileDeleteCommand> captor = ArgumentCaptor.forClass(FileDeleteCommand.class);
 
     private FileDelete component = new FileDelete();
 
@@ -80,7 +85,7 @@ class FileDeleteTest extends AbstractComponentTest {
         String payload = actual.payload();
 
         assertThat(payload).isEqualTo(fileIdToDelete);
-        assertThat(attributes).containsEntry("fileId", fileIdToDelete);
+        assertThat(attributes).containsEntry("id", fileIdToDelete);
     }
 
     @Test
