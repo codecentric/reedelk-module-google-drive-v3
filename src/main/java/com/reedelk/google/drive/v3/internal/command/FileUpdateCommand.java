@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileUpdate.FILE_ID_EMPTY;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileUpdate.GENERIC_ERROR;
 import static com.reedelk.runtime.api.commons.StringUtils.isBlank;
 
 public class FileUpdateCommand implements Command<File> {
@@ -37,7 +38,7 @@ public class FileUpdateCommand implements Command<File> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = "";
+        String error = GENERIC_ERROR.format(fileId, exception.getMessage());
         throw new FileUpdateException(error, exception);
     }
 }

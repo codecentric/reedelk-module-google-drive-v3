@@ -19,6 +19,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import static com.reedelk.google.drive.v3.internal.commons.Default.CONTENT_AS_INDEXABLE_TEXT;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FileUpload.FILE_NAME_EMPTY;
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Configuration.requireNotNull;
 import static java.util.Optional.ofNullable;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
@@ -73,18 +74,18 @@ public class FileUpload implements ProcessorSync {
     private Boolean indexableText;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
     @Reference
-    private ConverterService converterService;
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     private boolean realIndexableText;
 
     @Override
     public void initialize() {
         requireNotNull(FileUpload.class, fileName, "Google Drive File name must not be empty.");
-        driveApi = DriveApiFactory.create(FileUpload.class, configuration);
+        driveApi = createApi();
         realIndexableText = ofNullable(indexableText).orElse(CONTENT_AS_INDEXABLE_TEXT);
     }
 
@@ -92,7 +93,7 @@ public class FileUpload implements ProcessorSync {
     public Message apply(FlowContext flowContext, Message message) {
 
         String finalFileName = scriptEngine.evaluate(fileName, flowContext, message)
-                .orElseThrow(() -> new FileUploadException("File name must not be empty"));
+                .orElseThrow(() -> new FileUploadException(FILE_NAME_EMPTY.format(fileName.value())));
 
         String finalFileDescription = scriptEngine.evaluate(fileDescription, flowContext, message)
                 .orElse(null); // Not mandatory.
@@ -135,5 +136,9 @@ public class FileUpload implements ProcessorSync {
 
     public void setFileName(DynamicString fileName) {
         this.fileName = fileName;
+    }
+
+    DriveApi createApi() {
+        return DriveApiFactory.create(FileUpload.class, configuration);
     }
 }

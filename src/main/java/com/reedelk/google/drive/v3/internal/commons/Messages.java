@@ -62,12 +62,31 @@ public class Messages {
 
     public enum FileUpdate implements FormattedMessage {
 
+        GENERIC_ERROR("The file with File ID=[%s] could not be updated on Google Drive, cause=[%s]."),
         FILE_ID_NULL("The File ID was null: I cannot update a file with null ID (DynamicValue=[%s])."),
         FILE_ID_EMPTY("The File ID was empty: I cannot update a file from an empty File ID.");
 
         private final String message;
 
         FileUpdate(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String template() {
+            return message;
+        }
+    }
+
+    public enum FileUpload implements FormattedMessage {
+
+        FILE_NAME_EMPTY("The File name was empty: I cannot upload a file with an empty file name (DynamicValue=[%s])."),
+        GENERIC_ERROR("Could not upload file on Google Drive with configuration " +
+                "fileName=[%s], fileDescription=[%s], indexableText=[%s], parentFolderId=[%s], cause=[%s].");
+
+        private final String message;
+
+        FileUpload(String message) {
             this.message = message;
         }
 
