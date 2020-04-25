@@ -30,10 +30,6 @@
       "description": "Drive Permissions List",
       "configuration": {"ref": "314f4dc1-5809-4e3d-934e-03519709d619"},
       "fileId": ""
-    },
-    {
-      "implementor": "com.reedelk.json.component.ObjectToJSON",
-      "description": "Object to JSON"
     }
   ]
 }
