@@ -119,8 +119,8 @@ public class FileDownloadTest extends AbstractComponentTest {
         Message actual = component.apply(context, message);
 
         // Then
-        byte[] payload = actual.payload();
-        assertThat(payload).isEqualTo(fileContent.getBytes());
+        String payload = actual.payload();
+        assertThat(payload).isEqualTo(fileContent);
 
         MessageAttributes attributes = actual.getAttributes();
         assertThat(attributes).containsEntry("id", fileIdToDownload);

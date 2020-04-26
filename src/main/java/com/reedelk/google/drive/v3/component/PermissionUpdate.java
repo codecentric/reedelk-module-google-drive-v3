@@ -20,7 +20,6 @@ import org.osgi.service.component.annotations.Reference;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.FILE_ID_NULL;
 import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.PERMISSION_ID_NULL;
-import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.checkPreconditions;
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
@@ -45,26 +44,18 @@ public class PermissionUpdate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("Permission File ID")
+    @DefaultValue("#[]")
     @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file we want to update the permission for.")
     private DynamicString fileId;
 
     @Property("Permission ID")
+    @DefaultValue("#[]")
     @Hint("13346476095080557008")
     @Example("13346476095080557008")
     @Description("The ID of the permission we want to update. If empty, the permission ID is taken from the message payload.")
     private DynamicString permissionId;
-
-    @Property("Permission Type")
-    @InitValue("USER")
-    @Example("GROUP")
-    @DefaultValue("USER")
-    @Description("The type of the grantee. When creating a permission, if type is user or group, " +
-            "you must provide an emailAddress for the user or group. " +
-            "When type is domain, you must provide a domain. " +
-            "There isn't extra information required for a anyone type.")
-    private PermissionType type = PermissionType.USER;
 
     @Property("Permission Role")
     @Example("OWNER")
@@ -72,22 +63,6 @@ public class PermissionUpdate implements ProcessorSync {
     @DefaultValue("READER")
     @Description("The role granted by this permission.")
     private PermissionRole role = PermissionRole.READER;
-
-    @Property("Email")
-    @Hint("my-user@mydomain.com")
-    @Example("my-user@mydomain.com")
-    @Description("The email address of the user or group to which this permission refers.")
-    @When(propertyName = "type", propertyValue = "USER")
-    @When(propertyName = "type", propertyValue = "GROUP")
-    @When(propertyName = "type", propertyValue = When.NULL)
-    private DynamicString emailAddress;
-
-    @Property("Domain")
-    @Hint("www.mydomain.com")
-    @Example("www.mydomain.com")
-    @Description("The domain to which this permission refers.")
-    @When(propertyName = "type", propertyValue = "DOMAIN")
-    private DynamicString domain;
 
     @Reference
     ScriptEngineService scriptEngine;
@@ -98,7 +73,6 @@ public class PermissionUpdate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        checkPreconditions(type, emailAddress, domain);
         driveApi = createApi();
     }
 
@@ -124,11 +98,8 @@ public class PermissionUpdate implements ProcessorSync {
                     .orElseThrow(() -> new PermissionUpdateException(PERMISSION_ID_NULL.format(permissionId.value())));
         }
 
-        String evaluatedEmailAddress = scriptEngine.evaluate(emailAddress, flowContext, message).orElse(null);
-        String evaluatedDomain = scriptEngine.evaluate(domain, flowContext, message).orElse(null);
-
         PermissionUpdateCommand command =
-                new PermissionUpdateCommand(realFileId, realPermissionId, role, type, evaluatedEmailAddress, evaluatedDomain);
+                new PermissionUpdateCommand(realFileId, realPermissionId, role);
 
         Permission updated = driveApi.execute(command);
 
@@ -152,20 +123,8 @@ public class PermissionUpdate implements ProcessorSync {
         this.permissionId = permissionId;
     }
 
-    public void setType(PermissionType type) {
-        this.type = type;
-    }
-
     public void setRole(PermissionRole role) {
         this.role = role;
-    }
-
-    public void setEmailAddress(DynamicString emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    public void setDomain(DynamicString domain) {
-        this.domain = domain;
     }
 
     DriveApi createApi() {

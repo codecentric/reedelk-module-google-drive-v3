@@ -90,10 +90,16 @@ public class FileDownload implements ProcessorSync {
 
         byte[] content = driveApi.execute(command);
 
+        Object mappedContent = content;
+        if (String.class == finalMimeType.javaType()) {
+            // If the mime type is string, we convert it to string.
+            mappedContent = new String(content);
+        }
+
         FileDownloadAttributes attributes = new FileDownloadAttributes(realFileId);
 
         return MessageBuilder.get(FileDownload.class)
-                .withBinary(content, finalMimeType)
+                .withJavaObject(mappedContent, finalMimeType)
                 .attributes(attributes)
                 .build();
     }

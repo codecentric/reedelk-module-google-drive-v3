@@ -34,14 +34,11 @@ class PermissionUpdateTest extends AbstractComponentTest {
     @Test
     void shouldInvokeCommandWithCorrectArguments() {
         // Given
-        String emailAddress = "my-test@mydomain.com";
         String fileId = UUID.randomUUID().toString();
         String permissionId = UUID.randomUUID().toString();
-        component.setEmailAddress(DynamicString.from(emailAddress));
         component.setPermissionId(DynamicString.from(permissionId));
         component.setFileId(DynamicString.from(fileId));
         component.setRole(PermissionRole.READER);
-        component.setType(PermissionType.USER);
         component.initialize();
 
         Permission permission = new Permission();
@@ -57,9 +54,7 @@ class PermissionUpdateTest extends AbstractComponentTest {
         PermissionUpdateCommand value = captor.getValue();
 
         assertThat(value).hasFieldOrPropertyWithValue("fileId", fileId);
-        assertThat(value).hasFieldOrPropertyWithValue("domain", null);
-        assertThat(value).hasFieldOrPropertyWithValue("emailAddress", emailAddress);
-        assertThat(value).hasFieldOrPropertyWithValue("type", PermissionType.USER);
+        assertThat(value).hasFieldOrPropertyWithValue("permissionId", permissionId);
         assertThat(value).hasFieldOrPropertyWithValue("role", PermissionRole.READER);
     }
 
@@ -69,11 +64,9 @@ class PermissionUpdateTest extends AbstractComponentTest {
         String emailAddress = "my-test@mydomain.com";
         String fileId = UUID.randomUUID().toString();
         String permissionId = UUID.randomUUID().toString();
-        component.setEmailAddress(DynamicString.from(emailAddress));
         component.setPermissionId(DynamicString.from(permissionId));
         component.setFileId(DynamicString.from(fileId));
         component.setRole(PermissionRole.READER);
-        component.setType(PermissionType.USER);
         component.initialize();
 
         Permission permission = new Permission()

@@ -47,6 +47,7 @@ public class PermissionCreate implements ProcessorSync {
     private DriveConfiguration configuration;
 
     @Property("Permission File ID")
+    @DefaultValue("#[]")
     @Hint("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Example("1f1Vx-AanOdkVEQoewRhUQibOiyXq_RHG")
     @Description("The ID of the file or shared drive we want to create this permission for. " +

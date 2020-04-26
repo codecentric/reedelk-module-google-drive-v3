@@ -180,7 +180,7 @@ public class Messages {
         PERMISSION_ID_NULL("The Permission ID was null: I cannot update a permission for a file with null permission ID (DynamicValue=[%s])."),
         FILE_ID_NULL("The File ID was null: I cannot update a permission for a file with null ID (DynamicValue=[%s])."),
         GENERIC_ERROR("Could not update permission for file on Google Drive with configuration " +
-                "fileId=[%s], type=[%s], role=[%s], emailAddress=[%s], domain=[%s], cause=[%s].");
+                "fileId=[%s], role=[%s], cause=[%s].");
 
         private final String message;
 

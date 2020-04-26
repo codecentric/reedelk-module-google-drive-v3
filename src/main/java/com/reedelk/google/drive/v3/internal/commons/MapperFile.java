@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 
 public class MapperFile {
@@ -30,19 +28,6 @@ public class MapperFile {
     private static final String FIELD_FILE_EXTENSION = "fileExtension";
     private static final String FIELD_ORIGINAL_FILE_NAME = "originalFilename";
     private static final String FIELD_OWNERS = "owners";
-
-    public static final List<String> FIELDS = unmodifiableList(asList(
-            FIELD_ID,
-            FIELD_NAME,
-            FIELD_KIND,
-            FIELD_DRIVE_ID,
-            FIELD_OWNED_BY_ME,
-            FIELD_WEB_VIEW_LINK,
-            FIELD_WEB_CONTENT_LINK,
-            FIELD_DESCRIPTION,
-            FIELD_FILE_EXTENSION,
-            FIELD_ORIGINAL_FILE_NAME,
-            FIELD_OWNERS));
 
     private static final Function<User, Map<String, Serializable>> USER = user -> {
         Map<String, Serializable> map = new HashMap<>();

@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileList.GENERIC_ERROR;
-import static java.lang.String.join;
 import static java.util.stream.Collectors.toList;
 
+@SuppressWarnings("rawtypes")
 public class FileListCommand implements Command<List<Map>> {
 
     private final String nextPageToken;
@@ -43,7 +43,7 @@ public class FileListCommand implements Command<List<Map>> {
         list.setOrderBy(orderBy);
         list.setQ(query);
 
-        FileList files = list.setFields(join(",", MapperFile.FIELDS))
+        FileList files = list.setFields("*")
                 .execute();
 
         return files.getFiles()
