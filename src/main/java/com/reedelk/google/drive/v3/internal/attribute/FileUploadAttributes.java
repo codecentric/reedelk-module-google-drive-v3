@@ -3,9 +3,11 @@ package com.reedelk.google.drive.v3.internal.attribute;
 import com.google.api.services.drive.model.File;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 public class FileUploadAttributes extends HashMap<String, Serializable> {
 
@@ -15,7 +17,7 @@ public class FileUploadAttributes extends HashMap<String, Serializable> {
     private static final String ATTR_ID = "id";
 
     public static final List<String> ALL_ATTRIBUTES =
-            Arrays.asList(ATTR_WEB_CONTENT_LINK, ATTR_WEB_VIEW_LINK, ATTR_NAME, ATTR_ID);
+            unmodifiableList(asList(ATTR_WEB_CONTENT_LINK, ATTR_WEB_VIEW_LINK, ATTR_NAME, ATTR_ID));
 
     public FileUploadAttributes(File file) {
         put(ATTR_WEB_CONTENT_LINK, file.getWebContentLink());

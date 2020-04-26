@@ -3,9 +3,11 @@ package com.reedelk.google.drive.v3.internal.attribute;
 import com.google.api.services.drive.model.Permission;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 public class PermissionUpdateAttribute extends HashMap<String, Serializable> {
 
@@ -16,7 +18,7 @@ public class PermissionUpdateAttribute extends HashMap<String, Serializable> {
     private static final String ATTR_TYPE = "type";
 
     public static final List<String> ALL_ATTRIBUTES =
-            Arrays.asList(ATTR_ID, ATTR_KIND, ATTR_ROLE, ATTR_TYPE);
+            unmodifiableList(asList(ATTR_ID, ATTR_KIND, ATTR_ROLE, ATTR_TYPE));
 
     public PermissionUpdateAttribute(String fileId, Permission permission) {
         put(ATTR_ID, permission.getId());

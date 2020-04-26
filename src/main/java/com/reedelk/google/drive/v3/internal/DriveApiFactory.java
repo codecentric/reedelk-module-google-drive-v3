@@ -37,10 +37,10 @@ public class DriveApiFactory {
 
         // Build a new authorized API client service.
         try {
-            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             final Credentials credentials = createCredentialsFrom(implementor, configuration);
             final HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
-            final Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, requestInitializer)
+            final Drive service = new Drive.Builder(httpTransport, JSON_FACTORY, requestInitializer)
                     .setApplicationName(implementor.getSimpleName())
                     .build();
             return new DriveApi(service);

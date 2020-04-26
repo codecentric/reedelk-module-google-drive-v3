@@ -16,6 +16,9 @@ import static java.util.stream.Collectors.toList;
 
 public class MapperFile {
 
+    private MapperFile() {
+    }
+
     private static final String FIELD_ID = "id";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_KIND = "kind";

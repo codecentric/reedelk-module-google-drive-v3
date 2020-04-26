@@ -13,6 +13,9 @@ import static java.util.Collections.unmodifiableList;
 
 public class MapperPermission {
 
+    private MapperPermission() {
+    }
+
     private static final String FIELD_ID = "id";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_ROLE = "role";
