@@ -98,8 +98,8 @@ public class PermissionUpdate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        driveApi = DriveApiFactory.create(PermissionUpdate.class, configuration);
-        checkPreconditions(role, type, emailAddress, domain);
+        checkPreconditions(type, emailAddress, domain);
+        driveApi = createApi();
     }
 
     @Override
@@ -132,13 +132,43 @@ public class PermissionUpdate implements ProcessorSync {
 
         Permission updated = driveApi.execute(command);
 
-        String permissionId = updated.getId();
-
-        PermissionUpdateAttribute attribute = new PermissionUpdateAttribute(permissionId, realFileId);
+        PermissionUpdateAttribute attribute = new PermissionUpdateAttribute(realFileId, updated);
 
         return MessageBuilder.get(PermissionUpdate.class)
-                .withString(permissionId, MimeType.TEXT_PLAIN)
+                .withString(updated.getId(), MimeType.TEXT_PLAIN)
                 .attributes(attribute)
                 .build();
+    }
+
+    public void setConfiguration(DriveConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    public void setFileId(DynamicString fileId) {
+        this.fileId = fileId;
+    }
+
+    public void setPermissionId(DynamicString permissionId) {
+        this.permissionId = permissionId;
+    }
+
+    public void setType(PermissionType type) {
+        this.type = type;
+    }
+
+    public void setRole(PermissionRole role) {
+        this.role = role;
+    }
+
+    public void setEmailAddress(DynamicString emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public void setDomain(DynamicString domain) {
+        this.domain = domain;
+    }
+
+    DriveApi createApi() {
+        return DriveApiFactory.create(PermissionUpdate.class, configuration);
     }
 }

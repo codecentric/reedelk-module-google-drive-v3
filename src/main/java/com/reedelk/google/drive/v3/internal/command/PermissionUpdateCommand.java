@@ -4,6 +4,8 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionCreateAttribute;
+import com.reedelk.google.drive.v3.internal.attribute.PermissionUpdateAttribute;
 import com.reedelk.google.drive.v3.internal.commons.Messages;
 import com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate;
 import com.reedelk.google.drive.v3.internal.exception.PermissionUpdateException;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.*;
 import static com.reedelk.runtime.api.commons.Preconditions.checkState;
 import static com.reedelk.runtime.api.commons.StringUtils.*;
+import static java.lang.String.join;
 
 public class PermissionUpdateCommand implements Command<Permission> {
 
@@ -72,7 +75,9 @@ public class PermissionUpdateCommand implements Command<Permission> {
             update.setTransferOwnership(true);
         }
 
-        return update.execute();
+        return update
+                .setFields(join(",", PermissionUpdateAttribute.ALL_ATTRIBUTES))
+                .execute();
     }
 
     @Override

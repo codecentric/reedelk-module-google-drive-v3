@@ -1,7 +1,9 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.model.Permission;
+import com.reedelk.google.drive.v3.internal.command.FileDownloadCommand;
 import com.reedelk.google.drive.v3.internal.command.PermissionCreateCommand;
+import com.reedelk.google.drive.v3.internal.command.PermissionUpdateCommand;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageAttributes;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
@@ -13,14 +15,15 @@ import org.mockito.Captor;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class PermissionCreateTest extends AbstractComponentTest {
+class PermissionUpdateTest extends AbstractComponentTest {
 
     @Captor
-    protected ArgumentCaptor<PermissionCreateCommand> captor = ArgumentCaptor.forClass(PermissionCreateCommand.class);
+    protected ArgumentCaptor<PermissionUpdateCommand> captor = ArgumentCaptor.forClass(PermissionUpdateCommand.class);
 
-    private PermissionCreate component = spy(new PermissionCreate());
+    private PermissionUpdate component = spy(new PermissionUpdate());
 
     @BeforeEach
     void setUp() {
@@ -35,9 +38,10 @@ class PermissionCreateTest extends AbstractComponentTest {
         // Given
         String emailAddress = "my-test@mydomain.com";
         String fileId = UUID.randomUUID().toString();
+        String permissionId = UUID.randomUUID().toString();
         component.setEmailAddress(DynamicString.from(emailAddress));
+        component.setPermissionId(DynamicString.from(permissionId));
         component.setFileId(DynamicString.from(fileId));
-        component.setSendNotificationEmail(true);
         component.setRole(PermissionRole.READER);
         component.setType(PermissionType.USER);
         component.initialize();
@@ -45,19 +49,18 @@ class PermissionCreateTest extends AbstractComponentTest {
         Permission permission = new Permission();
         doReturn(permission)
                 .when(driveApi)
-                .execute(any(PermissionCreateCommand.class));
+                .execute(any(PermissionUpdateCommand.class));
 
         // When
         component.apply(context, message);
 
         // Then
         verify(driveApi).execute(captor.capture());
-        PermissionCreateCommand value = captor.getValue();
+        PermissionUpdateCommand value = captor.getValue();
 
         assertThat(value).hasFieldOrPropertyWithValue("fileId", fileId);
         assertThat(value).hasFieldOrPropertyWithValue("domain", null);
         assertThat(value).hasFieldOrPropertyWithValue("emailAddress", emailAddress);
-        assertThat(value).hasFieldOrPropertyWithValue("sendNotificationEmail", true);
         assertThat(value).hasFieldOrPropertyWithValue("type", PermissionType.USER);
         assertThat(value).hasFieldOrPropertyWithValue("role", PermissionRole.READER);
     }
@@ -67,14 +70,13 @@ class PermissionCreateTest extends AbstractComponentTest {
         // Given
         String emailAddress = "my-test@mydomain.com";
         String fileId = UUID.randomUUID().toString();
+        String permissionId = UUID.randomUUID().toString();
         component.setEmailAddress(DynamicString.from(emailAddress));
+        component.setPermissionId(DynamicString.from(permissionId));
         component.setFileId(DynamicString.from(fileId));
-        component.setSendNotificationEmail(true);
         component.setRole(PermissionRole.READER);
         component.setType(PermissionType.USER);
         component.initialize();
-
-        String permissionId = UUID.randomUUID().toString();
 
         Permission permission = new Permission()
                 .setId(permissionId)
@@ -85,7 +87,7 @@ class PermissionCreateTest extends AbstractComponentTest {
 
         doReturn(permission)
                 .when(driveApi)
-                .execute(any(PermissionCreateCommand.class));
+                .execute(any(PermissionUpdateCommand.class));
 
         // When
         Message actual = component.apply(context, message);

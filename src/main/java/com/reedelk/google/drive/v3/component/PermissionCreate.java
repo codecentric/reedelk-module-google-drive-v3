@@ -102,7 +102,7 @@ public class PermissionCreate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        checkPreconditions(role, type, emailAddress, domain);
+        checkPreconditions(type, emailAddress, domain);
         driveApi = createApi();
         realSendNotificationEmail =
                 Optional.ofNullable(sendNotificationEmail).orElse(SEND_NOTIFICATION_EMAIL);
