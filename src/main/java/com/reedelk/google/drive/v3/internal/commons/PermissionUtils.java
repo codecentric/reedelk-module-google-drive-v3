@@ -9,7 +9,6 @@ import static com.reedelk.runtime.api.commons.ComponentPrecondition.Configuratio
 
 public class PermissionUtils {
 
-    // TODO: Add a test here.
     public static void checkPreconditions(PermissionType type, DynamicString emailAddress, DynamicString domain) {
         if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
             requireNotNullOrBlank(PermissionCreate.class, emailAddress,

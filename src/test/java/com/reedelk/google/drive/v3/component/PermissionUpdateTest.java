@@ -1,8 +1,6 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.google.api.services.drive.model.Permission;
-import com.reedelk.google.drive.v3.internal.command.FileDownloadCommand;
-import com.reedelk.google.drive.v3.internal.command.PermissionCreateCommand;
 import com.reedelk.google.drive.v3.internal.command.PermissionUpdateCommand;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageAttributes;

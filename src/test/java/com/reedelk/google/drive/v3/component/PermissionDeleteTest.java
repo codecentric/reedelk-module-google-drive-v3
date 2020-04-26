@@ -1,23 +1,17 @@
 package com.reedelk.google.drive.v3.component;
 
-import com.reedelk.google.drive.v3.internal.command.FileDownloadCommand;
 import com.reedelk.google.drive.v3.internal.command.PermissionDeleteCommand;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageAttributes;
-import com.reedelk.runtime.api.message.MessageBuilder;
-import com.reedelk.runtime.api.message.content.MimeType;
-import com.reedelk.runtime.api.message.content.TypedContent;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class PermissionDeleteTest extends AbstractComponentTest {
