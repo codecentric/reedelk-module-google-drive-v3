@@ -45,25 +45,6 @@
             <version>${google.api.services.drive}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.reedelk</groupId>
-            <artifactId>module-core</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.reedelk</groupId>
-            <artifactId>module-rest</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.reedelk</groupId>
-            <artifactId>module-json</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.assertj</groupId>
