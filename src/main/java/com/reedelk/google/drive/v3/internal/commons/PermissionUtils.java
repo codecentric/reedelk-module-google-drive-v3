@@ -1,7 +1,6 @@
 package com.reedelk.google.drive.v3.internal.commons;
 
 import com.reedelk.google.drive.v3.component.PermissionCreate;
-import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 
