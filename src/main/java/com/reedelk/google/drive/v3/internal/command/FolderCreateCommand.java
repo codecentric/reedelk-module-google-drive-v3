@@ -11,6 +11,8 @@ import com.reedelk.runtime.api.exception.PlatformException;
 import java.io.IOException;
 import java.util.Collections;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FolderCreate.FOLDER_NAME_EMPTY;
+import static com.reedelk.runtime.api.commons.StringUtils.isBlank;
 import static com.reedelk.runtime.api.commons.StringUtils.isNotBlank;
 import static java.lang.String.join;
 
@@ -23,9 +25,12 @@ public class FolderCreateCommand implements Command<File> {
     public FolderCreateCommand(String folderName,
                                String folderDescription,
                                String parentFolderId) {
+        if (isBlank(folderName)) {
+            throw new FolderCreateException(FOLDER_NAME_EMPTY.format(folderName));
+        }
         this.folderDescription = folderDescription;
-        this.folderName = folderName;
         this.parentFolderId = parentFolderId;
+        this.folderName = folderName;
     }
 
     @Override

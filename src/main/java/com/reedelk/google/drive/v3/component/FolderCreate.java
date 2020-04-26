@@ -8,6 +8,7 @@ import com.reedelk.google.drive.v3.internal.command.FolderCreateCommand;
 import com.reedelk.google.drive.v3.internal.exception.FolderCreateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
+import com.reedelk.runtime.api.converter.ConverterService;
 import com.reedelk.runtime.api.flow.FlowContext;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageBuilder;
@@ -18,7 +19,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FolderCreate.FOLDER_NAME_EMPTY;
-import static com.reedelk.runtime.api.commons.ComponentPrecondition.Configuration.requireNotNull;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
+import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Folder Create")
@@ -56,26 +58,40 @@ public class FolderCreate implements ProcessorSync {
     @Property("Parent Folder ID")
     @Hint("0BwwA4oUTeiV1TGRPeTVjaWRDY1E")
     @Example("0BwwA4oUTeiV1TGRPeTVjaWRDY1E")
-    @Description("The ID of the parent folder which contain the new folder.\n" +
-            "If not specified, the file will be placed directly in the service account's My Drive folder. ")
+    @Description("The ID of the parent folder which contains the new folder to create.\n" +
+            "If not specified, the file will be placed directly in the Service Account's 'My Drive' folder. ")
     private DynamicString parentFolderId;
 
     @Reference
-    private ScriptEngineService scriptEngine;
+    ScriptEngineService scriptEngine;
+    @Reference
+    ConverterService converterService;
 
-    private DriveApi driveApi;
+    DriveApi driveApi;
 
     @Override
     public void initialize() {
-        requireNotNull(FolderCreate.class, folderName, "Google Drive Folder name must not be empty.");
-        driveApi = DriveApiFactory.create(FolderCreate.class, configuration);
+        driveApi = createApi();
     }
 
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
-        String finalFolderName = scriptEngine.evaluate(folderName, flowContext, message)
-                .orElseThrow(() -> new FolderCreateException(FOLDER_NAME_EMPTY.format(folderName.value())));
+        String finalFolderName;
+        if (isNullOrBlank(folderName)) {
+            // We take it from the message payload. The payload might not be a string,
+            // for example when we upload the File ID from a rest listener and we forget
+            // the mime type, therefore we have to convert it to a string type.
+            Object payload = message.payload(); // The payload might not be a string.
+
+            Input.requireTypeMatchesAny(FileDownload.class, payload, String.class, byte[].class);
+
+            finalFolderName = converterService.convert(payload, String.class);
+
+        } else {
+            finalFolderName = scriptEngine.evaluate(folderName, flowContext, message)
+                    .orElseThrow(() -> new FolderCreateException(FOLDER_NAME_EMPTY.format(folderName.value())));
+        }
 
         String finalFolderDescription = scriptEngine.evaluate(folderDescription, flowContext, message)
                 .orElse(null); // Not mandatory.
@@ -110,5 +126,9 @@ public class FolderCreate implements ProcessorSync {
 
     public void setFolderName(DynamicString folderName) {
         this.folderName = folderName;
+    }
+
+    DriveApi createApi() {
+        return DriveApiFactory.create(FolderCreate.class, configuration);
     }
 }
