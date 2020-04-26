@@ -26,7 +26,7 @@ public class FolderCreateCommand implements Command<File> {
                                String folderDescription,
                                String parentFolderId) {
         if (isBlank(folderName)) {
-            throw new FolderCreateException(FOLDER_NAME_EMPTY.format(folderName));
+            throw new FolderCreateException(FOLDER_NAME_EMPTY.format());
         }
         this.folderDescription = folderDescription;
         this.parentFolderId = parentFolderId;

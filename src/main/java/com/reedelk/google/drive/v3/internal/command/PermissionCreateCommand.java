@@ -5,14 +5,16 @@ import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionCreateAttribute;
-import com.reedelk.google.drive.v3.internal.commons.Messages;
 import com.reedelk.google.drive.v3.internal.exception.PermissionCreateException;
 import com.reedelk.runtime.api.commons.StringUtils;
 import com.reedelk.runtime.api.exception.PlatformException;
 
 import java.io.IOException;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionCreate.FILE_ID_EMPTY;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionCreate.GENERIC_ERROR;
 import static com.reedelk.runtime.api.commons.Preconditions.checkState;
+import static com.reedelk.runtime.api.commons.StringUtils.isBlank;
 import static java.lang.String.join;
 
 public class PermissionCreateCommand implements Command<Permission> {
@@ -30,6 +32,9 @@ public class PermissionCreateCommand implements Command<Permission> {
                                    String emailAddress,
                                    String domain,
                                    boolean sendNotificationEmail) {
+        if (isBlank(fileId)) {
+            throw new PermissionCreateException(FILE_ID_EMPTY.format());
+        }
         this.sendNotificationEmail = sendNotificationEmail;
         this.emailAddress = emailAddress;
         this.domain = domain;
@@ -74,7 +79,7 @@ public class PermissionCreateCommand implements Command<Permission> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = Messages.PermissionCreate.GENERIC_ERROR.format(
+        String error = GENERIC_ERROR.format(
                 fileId,
                 type,
                 role,

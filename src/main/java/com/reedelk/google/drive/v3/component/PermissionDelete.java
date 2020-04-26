@@ -70,9 +70,6 @@ public class PermissionDelete implements ProcessorSync {
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
-        String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
-                .orElseThrow(() -> new PermissionDeleteException(FILE_ID_NULL.format(fileId.value())));
-
         String realPermissionId;
         if (isNullOrBlank(permissionId)) {
             // We take it from the message payload. The payload might not be a string,
@@ -88,6 +85,9 @@ public class PermissionDelete implements ProcessorSync {
             realPermissionId = scriptEngine.evaluate(permissionId, flowContext, message)
                     .orElseThrow(() -> new PermissionDeleteException(PERMISSION_ID_NULL.format(permissionId.value())));
         }
+
+        String realFileId = scriptEngine.evaluate(fileId, flowContext, message)
+                .orElseThrow(() -> new PermissionDeleteException(FILE_ID_NULL.format(fileId.value())));
 
         PermissionDeleteCommand command = new PermissionDeleteCommand(realPermissionId, realFileId);
 

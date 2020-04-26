@@ -98,7 +98,8 @@ public class Messages {
 
     public enum FolderCreate implements FormattedMessage {
 
-        FOLDER_NAME_EMPTY("The Folder name was empty: I cannot create a folder with an empty name (DynamicValue=[%s])."),
+        FOLDER_NAME_EMPTY("The Folder name was empty: I cannot create a folder from an empty Folder name."),
+        FOLDER_NAME_NULL("The Folder name was empty: I cannot create a folder with an empty name (DynamicValue=[%s])."),
         GENERIC_ERROR("Could not create folder on Google Drive with configuration " +
                 "folderName=[%s], parentFolderId=[%s], folderDescription=[%s], cause=[%s].");
 
@@ -116,6 +117,7 @@ public class Messages {
 
     public enum PermissionCreate implements FormattedMessage {
 
+        FILE_ID_EMPTY("The File ID was empty: I cannot create a permission from an empty File ID."),
         FILE_ID_NULL("The File ID was null: I cannot create a permission for a file with null ID (DynamicValue=[%s])."),
         GENERIC_ERROR("Could not create permission for file on Google Drive with configuration " +
                 "fileId=[%s], type=[%s], role=[%s], emailAddress=[%s], domain=[%s], sendNotificationEmail=[%s], cause=[%s].");
@@ -134,6 +136,8 @@ public class Messages {
 
     public enum PermissionDelete implements FormattedMessage {
 
+        PERMISSION_ID_EMPTY("The Permission ID was empty: I cannot delete a permission from an empty Permission ID."),
+        FILE_ID_EMPTY("The File ID was empty: I cannot delete a permission from an empty File ID."),
         PERMISSION_ID_NULL("The Permission ID was null: I cannot delete a permission for a file with null permission ID (DynamicValue=[%s])."),
         FILE_ID_NULL("The File ID was null: I cannot delete a permission for a file with null ID (DynamicValue=[%s])."),
         GENERIC_ERROR("Could not delete permission for file on Google Drive with configuration " +
@@ -153,6 +157,7 @@ public class Messages {
 
     public enum PermissionList implements FormattedMessage {
 
+        FILE_ID_EMPTY("The File ID was empty: I cannot list permissions from an empty File ID."),
         FILE_ID_NULL("The File ID was null: I cannot list permissions for a file with null ID (DynamicValue=[%s])."),
         GENERIC_ERROR("Could not list permissions from Google Drive with configuration fileId=[%s], cause=[%s].");
 
@@ -170,6 +175,8 @@ public class Messages {
 
     public enum PermissionUpdate implements FormattedMessage {
 
+        PERMISSION_ID_EMPTY("The Permission ID was empty: I cannot update a permission from an empty Permission ID."),
+        FILE_ID_EMPTY("The File ID was empty: I cannot update a permission from an empty File ID."),
         PERMISSION_ID_NULL("The Permission ID was null: I cannot update a permission for a file with null permission ID (DynamicValue=[%s])."),
         FILE_ID_NULL("The File ID was null: I cannot update a permission for a file with null ID (DynamicValue=[%s])."),
         GENERIC_ERROR("Could not update permission for file on Google Drive with configuration " +

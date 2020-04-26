@@ -18,7 +18,7 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import static com.reedelk.google.drive.v3.internal.commons.Messages.FolderCreate.FOLDER_NAME_EMPTY;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.FolderCreate.FOLDER_NAME_NULL;
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
@@ -90,7 +90,7 @@ public class FolderCreate implements ProcessorSync {
 
         } else {
             finalFolderName = scriptEngine.evaluate(folderName, flowContext, message)
-                    .orElseThrow(() -> new FolderCreateException(FOLDER_NAME_EMPTY.format(folderName.value())));
+                    .orElseThrow(() -> new FolderCreateException(FOLDER_NAME_NULL.format(folderName.value())));
         }
 
         String finalFolderDescription = scriptEngine.evaluate(folderDescription, flowContext, message)

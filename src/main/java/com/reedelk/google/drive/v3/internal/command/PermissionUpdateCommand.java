@@ -4,6 +4,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Permission;
 import com.reedelk.google.drive.v3.component.PermissionRole;
 import com.reedelk.google.drive.v3.component.PermissionType;
+import com.reedelk.google.drive.v3.internal.commons.Messages;
 import com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate;
 import com.reedelk.google.drive.v3.internal.exception.PermissionUpdateException;
 import com.reedelk.runtime.api.commons.StringUtils;
@@ -11,7 +12,9 @@ import com.reedelk.runtime.api.exception.PlatformException;
 
 import java.io.IOException;
 
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.*;
 import static com.reedelk.runtime.api.commons.Preconditions.checkState;
+import static com.reedelk.runtime.api.commons.StringUtils.*;
 
 public class PermissionUpdateCommand implements Command<Permission> {
 
@@ -28,6 +31,12 @@ public class PermissionUpdateCommand implements Command<Permission> {
                                    PermissionType type,
                                    String emailAddress,
                                    String domain) {
+        if (isBlank(fileId)) {
+            throw new PermissionUpdateException(FILE_ID_EMPTY.format());
+        }
+        if (isBlank(permissionId)) {
+            throw new PermissionUpdateException(PERMISSION_ID_EMPTY.format());
+        }
         this.emailAddress = emailAddress;
         this.permissionId = permissionId;
         this.domain = domain;
@@ -44,13 +53,13 @@ public class PermissionUpdateCommand implements Command<Permission> {
 
         if (PermissionType.USER.equals(type) || PermissionType.GROUP.equals(type)) {
             // emailAddress is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
-            checkState(StringUtils.isNotBlank(emailAddress),
+            checkState(isNotBlank(emailAddress),
                     "Email address is mandatory when permission type is user or group.");
             updatedPermission.setEmailAddress(emailAddress);
 
         } else if (PermissionType.DOMAIN.equals(type)) {
             // domain is mandatory (see Google Doc: https://developers.google.com/drive/api/v3/reference/permissions/create).
-            checkState(StringUtils.isNotBlank(emailAddress),
+            checkState(isNotBlank(emailAddress),
                     "Domain is mandatory when permission type is domain.");
             updatedPermission.setDomain(domain);
         }
@@ -68,7 +77,7 @@ public class PermissionUpdateCommand implements Command<Permission> {
 
     @Override
     public PlatformException onException(Exception exception) {
-        String error = PermissionUpdate.GENERIC_ERROR.format(
+        String error = GENERIC_ERROR.format(
                 fileId,
                 type,
                 role,

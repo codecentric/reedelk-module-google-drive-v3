@@ -17,7 +17,7 @@ public class FileDownloadCommand implements Command<byte[]> {
 
     public FileDownloadCommand(String fileId) {
         if (isBlank(fileId)) {
-            throw new FileDownloadException(FILE_ID_EMPTY.format(fileId));
+            throw new FileDownloadException(FILE_ID_EMPTY.format());
         }
         this.fileId = fileId;
     }

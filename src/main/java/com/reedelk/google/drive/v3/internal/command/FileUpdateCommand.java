@@ -21,7 +21,7 @@ public class FileUpdateCommand implements Command<File> {
 
     public FileUpdateCommand(String fileId, byte[] fileContent) {
         if (isBlank(fileId)) {
-            throw new FileDownloadException(FILE_ID_EMPTY.format(fileId));
+            throw new FileDownloadException(FILE_ID_EMPTY.format());
         }
         this.fileContent = Optional.ofNullable(fileContent).orElse(new byte[0]);
         this.fileId = fileId;

@@ -16,7 +16,7 @@ public class FileDeleteCommand implements Command<Void> {
 
     public FileDeleteCommand(String fileId) {
         if (isBlank(fileId)) {
-            throw new FileDeleteException(FILE_ID_EMPTY.format(fileId));
+            throw new FileDeleteException(FILE_ID_EMPTY.format());
         }
         this.fileId = fileId;
     }
