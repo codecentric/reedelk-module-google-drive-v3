@@ -1,7 +1,6 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.command.FileDownloadCommand;
-import com.reedelk.google.drive.v3.internal.exception.FileDeleteException;
 import com.reedelk.google.drive.v3.internal.exception.FileDownloadException;
 import com.reedelk.runtime.api.commons.ModuleContext;
 import com.reedelk.runtime.api.exception.ComponentInputException;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 
 import java.util.Optional;
 import java.util.UUID;

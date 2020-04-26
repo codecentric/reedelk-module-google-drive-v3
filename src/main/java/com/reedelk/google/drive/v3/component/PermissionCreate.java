@@ -102,9 +102,10 @@ public class PermissionCreate implements ProcessorSync {
 
     @Override
     public void initialize() {
-        driveApi = DriveApiFactory.create(PermissionCreate.class, configuration);
         checkPreconditions(role, type, emailAddress, domain);
-        this.realSendNotificationEmail = Optional.ofNullable(sendNotificationEmail).orElse(SEND_NOTIFICATION_EMAIL);
+        driveApi = createApi();
+        realSendNotificationEmail =
+                Optional.ofNullable(sendNotificationEmail).orElse(SEND_NOTIFICATION_EMAIL);
     }
 
     @Override
@@ -170,5 +171,9 @@ public class PermissionCreate implements ProcessorSync {
 
     public void setType(PermissionType type) {
         this.type = type;
+    }
+
+    DriveApi createApi() {
+        return DriveApiFactory.create(PermissionCreate.class, configuration);
     }
 }

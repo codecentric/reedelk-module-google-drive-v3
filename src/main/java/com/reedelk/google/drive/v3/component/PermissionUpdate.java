@@ -5,7 +5,6 @@ import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionUpdateAttribute;
 import com.reedelk.google.drive.v3.internal.command.PermissionUpdateCommand;
-import com.reedelk.google.drive.v3.internal.commons.Messages;
 import com.reedelk.google.drive.v3.internal.exception.PermissionUpdateException;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
@@ -19,7 +18,8 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.*;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.FILE_ID_NULL;
+import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionUpdate.PERMISSION_ID_NULL;
 import static com.reedelk.google.drive.v3.internal.commons.PermissionUtils.checkPreconditions;
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;

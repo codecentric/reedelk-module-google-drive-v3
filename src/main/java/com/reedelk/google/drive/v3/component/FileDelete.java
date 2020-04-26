@@ -18,7 +18,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileDelete.FILE_ID_NULL;
-import static com.reedelk.runtime.api.commons.ComponentPrecondition.*;
+import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 

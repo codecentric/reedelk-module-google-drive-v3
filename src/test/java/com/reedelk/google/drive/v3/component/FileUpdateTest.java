@@ -1,7 +1,6 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.command.FileUpdateCommand;
-import com.reedelk.google.drive.v3.internal.exception.FileDownloadException;
 import com.reedelk.google.drive.v3.internal.exception.FileUpdateException;
 import com.reedelk.runtime.api.commons.ModuleContext;
 import com.reedelk.runtime.api.message.Message;
