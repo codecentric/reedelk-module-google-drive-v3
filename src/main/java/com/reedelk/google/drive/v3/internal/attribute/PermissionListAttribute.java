@@ -1,13 +1,18 @@
 package com.reedelk.google.drive.v3.internal.attribute;
 
-import java.io.Serializable;
-import java.util.HashMap;
+import com.reedelk.runtime.api.annotation.Type;
+import com.reedelk.runtime.api.annotation.TypeProperty;
+import com.reedelk.runtime.api.message.MessageAttributes;
 
-public class PermissionListAttribute extends HashMap<String, Serializable> {
+import static com.reedelk.google.drive.v3.internal.attribute.PermissionListAttribute.FILE_ID;
 
-    private static final String ATTR_FILE_ID = "fileId";
+@Type
+@TypeProperty(name = FILE_ID, type = String.class)
+public class PermissionListAttribute extends MessageAttributes {
+
+    static final String FILE_ID = "fileId";
 
     public PermissionListAttribute(String fileId) {
-        put(ATTR_FILE_ID, fileId);
+        put(FILE_ID, fileId);
     }
 }

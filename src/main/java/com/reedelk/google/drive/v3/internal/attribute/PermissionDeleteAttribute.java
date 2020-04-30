@@ -1,15 +1,22 @@
 package com.reedelk.google.drive.v3.internal.attribute;
 
-import java.io.Serializable;
-import java.util.HashMap;
+import com.reedelk.runtime.api.annotation.Type;
+import com.reedelk.runtime.api.annotation.TypeProperty;
+import com.reedelk.runtime.api.message.MessageAttributes;
 
-public class PermissionDeleteAttribute extends HashMap<String, Serializable> {
+import static com.reedelk.google.drive.v3.internal.attribute.PermissionDeleteAttribute.FILE_ID;
+import static com.reedelk.google.drive.v3.internal.attribute.PermissionDeleteAttribute.ID;
 
-    private static final String ATTR_ID = "id";
-    private static final String ATTR_FILE_ID = "fileId";
+@Type
+@TypeProperty(name = ID, type = String.class)
+@TypeProperty(name = FILE_ID, type = String.class)
+public class PermissionDeleteAttribute extends MessageAttributes {
+
+    static final String ID = "id";
+    static final String FILE_ID = "fileId";
 
     public PermissionDeleteAttribute(String permissionId, String fileId) {
-        put(ATTR_ID, permissionId);
-        put(ATTR_FILE_ID, fileId);
+        put(ID, permissionId);
+        put(FILE_ID, fileId);
     }
 }

@@ -1,28 +1,35 @@
 package com.reedelk.google.drive.v3.internal.attribute;
 
 import com.google.api.services.drive.model.File;
+import com.reedelk.runtime.api.annotation.Type;
+import com.reedelk.runtime.api.annotation.TypeProperty;
+import com.reedelk.runtime.api.message.MessageAttributes;
 
-import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 
+import static com.reedelk.google.drive.v3.internal.attribute.FolderCreateAttributes.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
-public class FolderCreateAttributes extends HashMap<String, Serializable> {
+@Type
+@TypeProperty(name = WEB_CONTENT_LINK, type = String.class)
+@TypeProperty(name = WEB_VIEW_LINK, type = String.class)
+@TypeProperty(name = NAME, type = String.class)
+@TypeProperty(name = ID, type = String.class)
+public class FolderCreateAttributes extends MessageAttributes {
 
-    private static final String ATTR_WEB_CONTENT_LINK = "webContentLink";
-    private static final String ATTR_WEB_VIEW_LINK = "webViewLink";
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_ID = "id";
+    static final String WEB_CONTENT_LINK = "webContentLink";
+    static final String WEB_VIEW_LINK = "webViewLink";
+    static final String NAME = "name";
+    static final String ID = "id";
 
     public static final List<String> ALL_ATTRIBUTES =
-            unmodifiableList(asList(ATTR_WEB_CONTENT_LINK, ATTR_WEB_VIEW_LINK, ATTR_NAME, ATTR_ID));
+            unmodifiableList(asList(WEB_CONTENT_LINK, WEB_VIEW_LINK, NAME, ID));
 
     public FolderCreateAttributes(File file) {
-        put(ATTR_WEB_CONTENT_LINK, file.getWebContentLink());
-        put(ATTR_WEB_VIEW_LINK, file.getWebViewLink());
-        put(ATTR_NAME, file.getName());
-        put(ATTR_ID, file.getId());
+        put(WEB_CONTENT_LINK, file.getWebContentLink());
+        put(WEB_VIEW_LINK, file.getWebViewLink());
+        put(NAME, file.getName());
+        put(ID, file.getId());
     }
 }
