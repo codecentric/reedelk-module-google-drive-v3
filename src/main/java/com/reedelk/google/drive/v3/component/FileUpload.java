@@ -26,6 +26,8 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive File Upload")
 @Component(service = FileUpload.class, scope = PROTOTYPE)
+@ComponentInput(payload = {String.class, byte[].class}, description = "The content of the file to be uploaded on Google Drive.")
+@ComponentOutput(attributes = FileUploadAttributes.class, payload = String.class, description = "The ID of the new file created on Google Drive.")
 @Description("Uploads a new file in Google Drive with the given name and optional description. " +
         "The content of the file is taken from the input message payload and if the file was successfully created " +
         "the ID of the file is returned in the output message payload. The default file owner will be the provided Service Account and permissions " +
@@ -36,9 +38,6 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         "of the Google Service Account which can be generated and downloaded from the Service Account page. " +
         "More info about Service Accounts and how they can be created and configured can " +
         "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
-@ComponentOutput(
-        attributes = FileUploadAttributes.class,
-        payload = String.class)
 public class FileUpload implements ProcessorSync {
 
     @Property("Configuration")
