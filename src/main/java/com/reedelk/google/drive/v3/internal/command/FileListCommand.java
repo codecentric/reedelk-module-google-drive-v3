@@ -2,19 +2,15 @@ package com.reedelk.google.drive.v3.internal.command;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.FileList;
-import com.reedelk.google.drive.v3.internal.commons.MapperFile;
 import com.reedelk.google.drive.v3.internal.exception.FileListException;
+import com.reedelk.google.drive.v3.internal.type.ListOfFiles;
 import com.reedelk.runtime.api.exception.PlatformException;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.FileList.GENERIC_ERROR;
-import static java.util.stream.Collectors.toList;
 
-@SuppressWarnings("rawtypes")
-public class FileListCommand implements Command<List<Map>> {
+public class FileListCommand implements Command<ListOfFiles> {
 
     private final String nextPageToken;
     private final String driveId;
@@ -35,7 +31,7 @@ public class FileListCommand implements Command<List<Map>> {
     }
 
     @Override
-    public List<Map> execute(Drive drive) throws IOException {
+    public ListOfFiles execute(Drive drive) throws IOException {
         Drive.Files.List list = drive.files().list();
         list.setPageToken(nextPageToken);
         list.setPageSize(pageSize);
@@ -43,13 +39,9 @@ public class FileListCommand implements Command<List<Map>> {
         list.setOrderBy(orderBy);
         list.setQ(query);
 
-        FileList files = list.setFields("*")
-                .execute();
+        FileList files = list.setFields("*").execute();
 
-        return files.getFiles()
-                .stream()
-                .map(MapperFile.GET)
-                .collect(toList());
+        return new ListOfFiles(files.getFiles());
     }
 
     @Override

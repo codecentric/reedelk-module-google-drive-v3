@@ -1,6 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.command.FileListCommand;
+import com.reedelk.google.drive.v3.internal.type.ListOfFiles;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageAttributes;
 import com.reedelk.runtime.api.message.content.MimeType;
@@ -12,8 +13,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,7 +86,7 @@ class FileListTest extends AbstractComponentTest {
         // Given
         component.initialize();
 
-        List<Map> mappedFiles = new ArrayList<>();
+        ListOfFiles mappedFiles = new ListOfFiles(new ArrayList<>());
 
         doReturn(mappedFiles)
                 .when(driveApi)
@@ -97,7 +96,7 @@ class FileListTest extends AbstractComponentTest {
         Message actual = component.apply(context, message);
 
         // Then
-        List<Map> payload = actual.payload();
+        ListOfFiles payload = actual.payload();
         assertThat(payload).isEqualTo(mappedFiles);
 
         MessageAttributes attributes = actual.getAttributes();

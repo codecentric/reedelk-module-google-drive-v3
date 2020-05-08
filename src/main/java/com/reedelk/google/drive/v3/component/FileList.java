@@ -4,6 +4,8 @@ import com.reedelk.google.drive.v3.internal.DriveApi;
 import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.command.FileListCommand;
 import com.reedelk.google.drive.v3.internal.commons.Default;
+import com.reedelk.google.drive.v3.internal.type.FileType;
+import com.reedelk.google.drive.v3.internal.type.ListOfFiles;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.flow.FlowContext;
@@ -14,14 +16,13 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Files List")
 @Component(service = FileList.class, scope = PROTOTYPE)
+@ComponentOutput(payload = ListOfFiles.class, description = "The list of files from Google Drive.")
 @Description("Lists files from Google Drive. " +
         "Optional search filters and order by sort keys can be applied to filter and order the returned results. " +
         "If the number of returned files is potentially large it is recommended to use pagination by setting the page size and page token for subsequent listings." +
@@ -126,10 +127,10 @@ public class FileList implements ProcessorSync {
         FileListCommand command =
                 new FileListCommand(driveId, orderBy, realPageSize, realNextPageToken, realQuery);
 
-        List<Map> driveFiles = driveApi.execute(command);
+        ListOfFiles driveFiles = driveApi.execute(command);
 
         return MessageBuilder.get(FileList.class)
-                .withList(driveFiles, Map.class)
+                .withList(driveFiles, FileType.class)
                 .build();
     }
 
