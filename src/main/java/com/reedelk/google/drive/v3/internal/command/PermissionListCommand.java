@@ -2,21 +2,17 @@ package com.reedelk.google.drive.v3.internal.command;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.PermissionList;
-import com.reedelk.google.drive.v3.internal.commons.MapperPermission;
 import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
+import com.reedelk.google.drive.v3.internal.type.ListOfPermissions;
 import com.reedelk.runtime.api.exception.PlatformException;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionList.FILE_ID_EMPTY;
 import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionList.GENERIC_ERROR;
 import static com.reedelk.runtime.api.commons.StringUtils.isBlank;
-import static java.util.stream.Collectors.toList;
 
-@SuppressWarnings("rawtypes")
-public class PermissionListCommand implements Command<List<Map>> {
+public class PermissionListCommand implements Command<ListOfPermissions> {
 
     private final String fileId;
 
@@ -28,16 +24,13 @@ public class PermissionListCommand implements Command<List<Map>> {
     }
 
     @Override
-    public List<Map> execute(Drive drive) throws IOException {
+    public ListOfPermissions execute(Drive drive) throws IOException {
 
         PermissionList list = drive.permissions().list(fileId)
                 .setFields("*")
                 .execute();
 
-        return list.getPermissions()
-                .stream()
-                .map(MapperPermission.GET)
-                .collect(toList());
+        return new ListOfPermissions(list.getPermissions());
     }
 
     @Override

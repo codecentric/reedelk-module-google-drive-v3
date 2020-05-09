@@ -29,6 +29,10 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Permission Create")
 @Component(service = PermissionCreate.class, scope = PROTOTYPE)
+@ComponentOutput(
+        attributes = PermissionCreateAttribute.class,
+        payload = String.class,
+        description = "The ID of the new permission created on Google Drive.")
 @Description("Creates a new permission for a file in Google Drive. " +
         "If not defined in the 'File ID' property, the ID of the file we want to assign the permission to is taken from the input message payload. " +
         "A permission grants a user, group, domain or the world access to a file or a folder hierarchy." +

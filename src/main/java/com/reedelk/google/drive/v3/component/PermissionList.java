@@ -5,6 +5,8 @@ import com.reedelk.google.drive.v3.internal.DriveApiFactory;
 import com.reedelk.google.drive.v3.internal.attribute.PermissionListAttribute;
 import com.reedelk.google.drive.v3.internal.command.PermissionListCommand;
 import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
+import com.reedelk.google.drive.v3.internal.type.ListOfPermissions;
+import com.reedelk.google.drive.v3.internal.type.PermissionType;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -16,9 +18,6 @@ import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.List;
-import java.util.Map;
-
 import static com.reedelk.google.drive.v3.internal.commons.Messages.PermissionList.FILE_ID_NULL;
 import static com.reedelk.runtime.api.commons.ComponentPrecondition.Input;
 import static com.reedelk.runtime.api.commons.DynamicValueUtils.isNullOrBlank;
@@ -26,6 +25,10 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Permissions List")
 @Component(service = PermissionList.class, scope = PROTOTYPE)
+@ComponentOutput(
+        attributes = PermissionListAttribute.class,
+        payload = ListOfPermissions.class,
+        description = "The list of permission for the file on Google Drive.")
 @Description("Lists all the permissions of a file in Google Drive. " +
         "If not defined in the 'File ID' property, the ID of the file we want to list the permissions from is taken from the input message payload. " +
         "This component requires the configuration of a Service Account to make authorized API calls " +
@@ -62,7 +65,6 @@ public class PermissionList implements ProcessorSync {
         driveApi = DriveApiFactory.create(PermissionList.class, configuration);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public Message apply(FlowContext flowContext, Message message) {
 
@@ -84,12 +86,12 @@ public class PermissionList implements ProcessorSync {
 
         PermissionListCommand command = new PermissionListCommand(realFileId);
 
-        List<Map> permissions = driveApi.execute(command);
+        ListOfPermissions permissions = driveApi.execute(command);
 
         PermissionListAttribute attribute = new PermissionListAttribute(realFileId);
 
         return MessageBuilder.get(PermissionList.class)
-                .withList(permissions, Map.class)
+                .withList(permissions, PermissionType.class)
                 .attributes(attribute)
                 .build();
     }

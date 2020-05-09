@@ -22,7 +22,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Files List")
 @Component(service = FileList.class, scope = PROTOTYPE)
-@ComponentOutput(payload = ListOfFiles.class, description = "The list of files from Google Drive.")
+@ComponentOutput(
+        payload = ListOfFiles.class,
+        description = "The list of files from Google Drive.")
 @Description("Lists files from Google Drive. " +
         "Optional search filters and order by sort keys can be applied to filter and order the returned results. " +
         "If the number of returned files is potentially large it is recommended to use pagination by setting the page size and page token for subsequent listings." +
@@ -64,7 +66,6 @@ public class FileList implements ProcessorSync {
     @Example("<code>message.attributes().nextPageToken</code>")
     @Description("The token for continuing a previous list request on the next page. " +
             "This should be set to the value of 'nextPageToken' from the previous response.")
-    @When(propertyName = "pageSize", propertyValue = When.NOT_BLANK)
     private DynamicString nextPageToken;
 
     @Property("Filter Query")

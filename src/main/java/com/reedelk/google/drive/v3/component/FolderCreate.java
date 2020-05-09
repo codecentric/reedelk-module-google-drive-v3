@@ -25,6 +25,10 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive Folder Create")
 @Component(service = FolderCreate.class, scope = PROTOTYPE)
+@ComponentOutput(
+        attributes = FolderCreateAttributes.class,
+        payload = String.class,
+        description = "The ID of the new folder created on Google Drive.")
 @Description("Creates a new folder in Google Drive with the given name and optional description. " +
         "The default folder owner will be the provided Service Account and permissions " +
         "on the folder must be used in order to assign further read/write permissions to other users. New permissions can be " +
