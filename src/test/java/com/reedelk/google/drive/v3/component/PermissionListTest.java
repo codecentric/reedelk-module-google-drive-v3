@@ -1,6 +1,7 @@
 package com.reedelk.google.drive.v3.component;
 
 import com.reedelk.google.drive.v3.internal.command.PermissionListCommand;
+import com.reedelk.google.drive.v3.internal.type.ListOfPermissions;
 import com.reedelk.runtime.api.message.Message;
 import com.reedelk.runtime.api.message.MessageAttributes;
 import com.reedelk.runtime.api.script.dynamicvalue.DynamicString;
@@ -38,7 +39,7 @@ class PermissionListTest extends AbstractComponentTest {
         String fileId = UUID.randomUUID().toString();
         component.setFileId(DynamicString.from(fileId));
 
-        List<Map> permissions = new ArrayList<>();
+        ListOfPermissions permissions = new ListOfPermissions(new ArrayList<>());
         doReturn(permissions)
                 .when(driveApi)
                 .execute(any(PermissionListCommand.class));
@@ -59,7 +60,7 @@ class PermissionListTest extends AbstractComponentTest {
         String fileId = UUID.randomUUID().toString();
         component.setFileId(DynamicString.from(fileId));
 
-        List<Map> permissions = new ArrayList<>();
+        ListOfPermissions permissions = new ListOfPermissions(new ArrayList<>());
         doReturn(permissions)
                 .when(driveApi)
                 .execute(any(PermissionListCommand.class));

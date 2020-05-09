@@ -38,6 +38,7 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         "be found in the official Google Service Accounts <a href=\"https://cloud.google.com/iam/docs/service-accounts\">Documentation</a> page.")
 public class FileDelete implements ProcessorSync {
 
+    @DialogTitle("Service Account Configuration")
     @Property("Configuration")
     @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
             "This component requires the configuration of a Service Account to make authorized API calls " +
