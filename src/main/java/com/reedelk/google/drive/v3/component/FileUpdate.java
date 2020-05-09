@@ -22,7 +22,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive File Update")
 @Component(service = FileUpdate.class, scope = PROTOTYPE)
-@ComponentInput(payload = {String.class, byte[].class}, description = "The updated content of the file to update on Google Drive.")
+@ComponentInput(
+        payload = { String.class, byte[].class },
+        description = "The updated content of the file to update on Google Drive.")
 @ComponentOutput(
         attributes = FileUpdateAttributes.class,
         payload = String.class,
