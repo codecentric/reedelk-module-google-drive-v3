@@ -37,6 +37,7 @@ public class FileList implements ProcessorSync {
 
     @DialogTitle("Service Account Configuration")
     @Property("Configuration")
+    @Mandatory
     @Description("The Google Service Account Configuration to be used to connect to Google Drive." +
             "This component requires the configuration of a Service Account to make authorized API calls " +
             "on behalf of the user. More info about Service Accounts and how they can be configured can " +

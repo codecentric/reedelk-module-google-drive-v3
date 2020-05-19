@@ -10,6 +10,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class DriveConfiguration implements Implementor {
 
     @WidthAuto
+    @Mandatory
     @Hint("${RUNTIME_CONFIG}/my_credentials.json")
     @Example("${RUNTIME_CONFIG}/my_credentials.json")
     @Description("The path of the Google Service Account Credentials JSON file. " +
