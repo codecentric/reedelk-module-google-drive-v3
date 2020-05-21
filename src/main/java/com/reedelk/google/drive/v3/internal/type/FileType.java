@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import static com.reedelk.google.drive.v3.internal.type.FileType.*;
 
-@Type
+@Type(displayName = "FileType", mapKeyType = String.class, mapValueType = Serializable.class)
 @TypeProperty(name = ID, type = String.class)
 @TypeProperty(name = NAME, type = String.class)
 @TypeProperty(name = KIND, type = String.class)

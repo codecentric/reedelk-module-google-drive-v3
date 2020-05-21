@@ -7,7 +7,7 @@ import com.reedelk.runtime.api.annotation.TypeProperty;
 import java.io.Serializable;
 import java.util.HashMap;
 
-@Type
+@Type(displayName = "UserType", mapKeyType = String.class, mapValueType = Serializable.class)
 @TypeProperty(name = UserType.EMAIL_ADDRESS, type = String.class)
 public class UserType extends HashMap<String, Serializable> {
 
