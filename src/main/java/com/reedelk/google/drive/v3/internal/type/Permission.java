@@ -1,22 +1,21 @@
 package com.reedelk.google.drive.v3.internal.type;
 
-import com.google.api.services.drive.model.Permission;
 import com.reedelk.runtime.api.annotation.Type;
 import com.reedelk.runtime.api.annotation.TypeProperty;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-import static com.reedelk.google.drive.v3.internal.type.PermissionType.*;
+import static com.reedelk.google.drive.v3.internal.type.Permission.*;
 
-@Type(mapKeyType = String.class, mapValueType = Serializable.class)
+@Type(displayName = "Permission", mapKeyType = String.class, mapValueType = Serializable.class)
 @TypeProperty(name = ID, type = String.class)
 @TypeProperty(name = TYPE, type = String.class)
 @TypeProperty(name = ROLE, type = String.class)
 @TypeProperty(name = DOMAIN, type = String.class)
 @TypeProperty(name = DISPLAY_NAME, type = String.class)
 @TypeProperty(name = EMAIL_ADDRESS, type = String.class)
-public class PermissionType extends HashMap<String, Serializable> {
+public class Permission extends HashMap<String, Serializable> {
 
     static final String ID = "id";
     static final String TYPE = "type";
@@ -25,7 +24,7 @@ public class PermissionType extends HashMap<String, Serializable> {
     static final String DISPLAY_NAME = "displayName";
     static final String EMAIL_ADDRESS = "emailAddress";
 
-    public PermissionType(Permission permission) {
+    public Permission(com.google.api.services.drive.model.Permission permission) {
         put(ID, permission.getId());
         put(TYPE, permission.getType());
         put(ROLE, permission.getRole());

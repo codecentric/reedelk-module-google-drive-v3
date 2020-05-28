@@ -6,7 +6,7 @@ import com.reedelk.google.drive.v3.internal.attribute.PermissionListAttribute;
 import com.reedelk.google.drive.v3.internal.command.PermissionListCommand;
 import com.reedelk.google.drive.v3.internal.exception.PermissionListException;
 import com.reedelk.google.drive.v3.internal.type.ListOfPermissions;
-import com.reedelk.google.drive.v3.internal.type.PermissionType;
+import com.reedelk.google.drive.v3.internal.type.Permission;
 import com.reedelk.runtime.api.annotation.*;
 import com.reedelk.runtime.api.component.ProcessorSync;
 import com.reedelk.runtime.api.converter.ConverterService;
@@ -95,7 +95,7 @@ public class PermissionList implements ProcessorSync {
         PermissionListAttribute attribute = new PermissionListAttribute(realFileId);
 
         return MessageBuilder.get(PermissionList.class)
-                .withList(permissions, PermissionType.class)
+                .withList(permissions, Permission.class)
                 .attributes(attribute)
                 .build();
     }
