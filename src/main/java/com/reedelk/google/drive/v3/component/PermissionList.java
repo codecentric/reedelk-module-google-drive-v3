@@ -29,6 +29,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         attributes = PermissionListAttribute.class,
         payload = ListOfPermissions.class,
         description = "The list of permission for the file on Google Drive.")
+@ComponentInput(
+        payload = { String.class },
+        description = "The input payload is used as file id for which the permissions should listed from.")
 @Description("Lists all the permissions of a file in Google Drive. " +
         "If not defined in the 'File ID' property, the ID of the file we want to list the permissions from is taken from the input message payload. " +
         "This component requires the configuration of a Service Account to make authorized API calls " +

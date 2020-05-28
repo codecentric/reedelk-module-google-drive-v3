@@ -26,7 +26,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 
 @ModuleComponent("Drive File Upload")
 @Component(service = FileUpload.class, scope = PROTOTYPE)
-@ComponentInput(payload = {String.class, byte[].class}, description = "The content of the file to be uploaded on Google Drive.")
+@ComponentInput(
+        payload = { Object.class, byte[].class },
+        description = "The content of the file to be uploaded on Google Drive.")
 @ComponentOutput(
         attributes = FileUploadAttributes.class,
         payload = String.class,

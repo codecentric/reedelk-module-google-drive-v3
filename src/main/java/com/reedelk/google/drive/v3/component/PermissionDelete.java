@@ -29,6 +29,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         attributes = PermissionDeleteAttribute.class,
         payload = String.class,
         description = "The ID of the permission deleted from the file on Google Drive.")
+@ComponentInput(
+        payload = { String.class },
+        description = "The input payload is used as permission id to delete from Google Drive.")
 @Description("Deletes a permission from a file in Google Drive. " +
         "If not defined in the 'Permission ID' property, the ID of the permission we want to remove is taken from the input message payload. " +
         "This component requires to specify a not empty 'File ID' property which identifies the file we want to remove the permission from. " +

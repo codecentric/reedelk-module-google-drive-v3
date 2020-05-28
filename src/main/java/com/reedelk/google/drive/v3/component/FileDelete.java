@@ -28,6 +28,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         attributes = FileDeleteAttributes.class,
         payload = String.class,
         description = "The ID of the deleted file on Google Drive.")
+@ComponentInput(
+        payload = { String.class, byte[].class },
+        description = "The input payload is used as file id of the file to delete from Google Drive.")
 @Description("Deletes a file with the given file ID from Google Drive. " +
         "The ID of the file to be deleted is taken from the input message payload if not defined in the 'File ID' property. " +
         "An expression can be used to dynamically evaluate the file ID. " +

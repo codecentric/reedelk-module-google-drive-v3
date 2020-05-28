@@ -25,6 +25,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
 @ComponentOutput(
         payload = ListOfFiles.class,
         description = "The list of files from Google Drive.")
+@ComponentInput(
+        payload = Object.class,
+        description = "The input payload to evaluate the query or the next token expressions.")
 @Description("Lists files from Google Drive. " +
         "Optional search filters and order by sort keys can be applied to filter and order the returned results. " +
         "If the number of returned files is potentially large it is recommended to use pagination by setting the page size and page token for subsequent listings." +

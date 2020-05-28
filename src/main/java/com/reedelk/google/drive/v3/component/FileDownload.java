@@ -28,6 +28,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         attributes = FileDownloadAttributes.class,
         payload = { String.class, byte[].class},
         description = "The content of the downloaded file in bytes or string if the mime type is a string type mime type (e.g text/plain).")
+@ComponentInput(
+        payload = { String.class, byte[].class },
+        description = "The input payload is used as file id of the file to download from Google Drive.")
 @Description("Downloads the content of the file with the given file ID from Google Drive. " +
         "This component requires the configuration of a Service Account to make authorized API calls " +
         "on behalf of the user. The component's configuration uses the private key (in JSON format) " +

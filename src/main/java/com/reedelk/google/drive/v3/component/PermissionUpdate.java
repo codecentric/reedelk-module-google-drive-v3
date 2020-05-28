@@ -30,6 +30,9 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         attributes = PermissionUpdateAttribute.class,
         payload = String.class,
         description = "The ID of the permission updated on Google Drive.")
+@ComponentInput(
+        payload = { String.class },
+        description = "The input payload is used as permission id for which we want to update permissions.")
 @Description("Updates a permissions for a given file in Google Drive. " +
         "If not defined in the 'Permission ID' property, the ID of the permission we want to update is taken from the input message payload. " +
         "This component requires to specify a not empty 'File ID' property which identifies the file we want to update the permission to. " +
