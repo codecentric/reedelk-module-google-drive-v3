@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 import static com.reedelk.google.drive.v3.internal.type.PermissionType.*;
 
-@Type
+@Type(mapKeyType = String.class, mapValueType = Serializable.class)
 @TypeProperty(name = ID, type = String.class)
 @TypeProperty(name = TYPE, type = String.class)
 @TypeProperty(name = ROLE, type = String.class)
