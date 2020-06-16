@@ -65,8 +65,6 @@ public class FileList implements ProcessorSync {
 
     @Property("Page Token")
     @Group("Paging")
-    @InitValue("#[message.attributes().nextPageToken]")
-    @DefaultValue("#[message.attributes().nextPageToken]")
     @Hint("Use a dynamic value to set next page token: message.attributes().nextPageToken")
     @Example("<code>message.attributes().nextPageToken</code>")
     @Description("The token for continuing a previous list request on the next page. " +
