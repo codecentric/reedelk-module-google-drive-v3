@@ -27,7 +27,7 @@ import static org.osgi.service.component.annotations.ServiceScope.PROTOTYPE;
         payload = String.class,
         description = "The ID of the updated file on Google Drive.")
 @ComponentInput(
-        payload = { Object.class, byte[].class },
+        payload = { String.class, byte[].class },
         description = "The updated content of the file to update on Google Drive.")
 @Description("Updates the content of the file with the given file ID in Google Drive. " +
         "The 'File ID' property is mandatory and a dynamic expression can be used to dynamically evaluate the file ID. " +
